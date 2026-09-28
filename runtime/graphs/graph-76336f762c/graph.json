@@ -1,0 +1,114 @@
+{
+  "id": "graph-76336f762c",
+  "name": "语言检测问候",
+  "business_goal": "检测输入文本语言，英文输出 hello，非英文输出 你好",
+  "description": "用 condition node 判断语言，走不同链路输出对应问候语",
+  "status": "draft",
+  "nodes": [
+    {
+      "id": "input",
+      "type": "input",
+      "title": "用户输入",
+      "description": "",
+      "config": {
+        "output_schema": {
+          "user_text": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "detect_language",
+      "type": "condition",
+      "title": "语言检测",
+      "description": "判断输入文本是否为纯英文",
+      "config": {
+        "input_schema": {
+          "user_text": "string"
+        },
+        "output_schema": {
+          "user_text": "string"
+        },
+        "expression": "all chars ASCII => english, else non_english"
+      },
+      "status": "idle"
+    },
+    {
+      "id": "greet_english",
+      "type": "work",
+      "title": "英文问候",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "user_text": "string"
+        },
+        "output_schema": {
+          "greeting": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "greet_chinese",
+      "type": "work",
+      "title": "中文问候",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "user_text": "string"
+        },
+        "output_schema": {
+          "greeting": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "title": "输出结果",
+      "description": "",
+      "config": {
+        "merge_strategy": "any",
+        "input_schema": {
+          "greeting": "string"
+        }
+      },
+      "status": "idle"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input",
+      "target": "detect_language",
+      "label": "",
+      "id": "input-detect_language"
+    },
+    {
+      "source": "detect_language",
+      "target": "greet_english",
+      "label": "english",
+      "id": "detect_language-greet_english"
+    },
+    {
+      "source": "detect_language",
+      "target": "greet_chinese",
+      "label": "non_english",
+      "id": "detect_language-greet_chinese"
+    },
+    {
+      "source": "greet_english",
+      "target": "output",
+      "label": "",
+      "id": "greet_english-output"
+    },
+    {
+      "source": "greet_chinese",
+      "target": "output",
+      "label": "",
+      "id": "greet_chinese-output"
+    }
+  ],
+  "created_at": "2026-07-22T03:06:58.136976+00:00",
+  "updated_at": "2026-07-22T03:13:25.206633+00:00"
+}

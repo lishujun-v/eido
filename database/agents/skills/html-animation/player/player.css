@@ -1,0 +1,267 @@
+/* ============================================
+   HTML Animation Player — Styles
+   ============================================ */
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+/* --- Player Container --- */
+.player {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  background: #1a1a2e;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+/* --- Scene Area --- */
+.scene-container {
+  position: absolute;
+  inset: 0;
+  bottom: 48px; /* controls bar height */
+  overflow: hidden;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.scene-layer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Transition States --- */
+.scene-layer.transition-fade-in {
+  opacity: 0;
+  transform: none;
+}
+.scene-layer.transition-fade-out {
+  opacity: 0;
+  transform: none;
+}
+
+.scene-layer.transition-slide-in {
+  opacity: 0;
+  transform: translateX(60px);
+}
+.scene-layer.transition-slide-out {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+.scene-layer.transition-zoom-in {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.scene-layer.transition-zoom-out {
+  opacity: 0;
+  transform: scale(1.1);
+}
+
+/* --- Subtitles --- */
+.subtitle-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-size: 15px;
+  max-width: 82%;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  transition: opacity 0.25s ease;
+  z-index: 10;
+}
+
+.subtitle-overlay:empty {
+  opacity: 0;
+}
+
+/* --- Controls Bar --- */
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(22, 22, 42, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  z-index: 20;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.controls button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.controls button:active { color: #fff; background: rgba(255,255,255,0.14); }
+
+.controls .btn-play { font-size: 17px; }
+
+.controls .time-display {
+  color: #aaa;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 92px;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* --- Progress Bar --- */
+.progress-bar {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.progress-bar:hover { height: 7px; }
+
+.progress-fill {
+  height: 100%;
+  background: #7ecb76;
+  border-radius: 3px;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+.progress-bar:hover .progress-fill { background: #8fd988; }
+
+.progress-thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.progress-bar:hover .progress-thumb { opacity: 1; }
+
+/* --- Speed Badge --- */
+.speed-badge {
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 32px;
+  text-align: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.speed-badge:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+/* --- Loading --- */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.4s ease;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,0.12);
+  border-top-color: #7ecb76;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  color: #888;
+  font-size: 13px;
+  margin-top: 14px;
+  letter-spacing: 0.04em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .player {
+    border-radius: 0;
+    max-width: 100%;
+  }
+  .subtitle-overlay {
+    font-size: 13px;
+    padding: 6px 14px;
+    bottom: 10px;
+  }
+  .controls {
+    height: 40px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+  .controls button { width: 26px; height: 26px; font-size: 13px; }
+  .controls .time-display { font-size: 11px; min-width: 76px; }
+}
+
+@media (max-width: 480px) {
+  .subtitle-overlay {
+    font-size: 12px;
+    bottom: 6px;
+    max-width: 92%;
+  }
+}

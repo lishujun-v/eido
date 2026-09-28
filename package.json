@@ -1,0 +1,38 @@
+{
+  "name": "siinx",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "webui"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @eido/webui",
+    "dev:alt": "npm run dev:alt --workspace @eido/webui",
+    "agent:server": ".venv/bin/python -m uvicorn --app-dir src/agents/server/python eido_agent.server:app --reload --reload-dir src/agents/server/python --host 127.0.0.1 --port 8000",
+    "agent:smoke": ".venv/bin/python src/agents/cli/smoke_test.py",
+    "agent": "node --no-warnings src/agents/cli/main.ts",
+    "knowledge": "node --no-warnings src/knowledge/cli/main.ts",
+    "channel:weixin": "node --no-warnings src/channels/weixin/cli.ts",
+    "knowledge:model:download": ".venv/bin/python src/knowledge/server/python/download_bge_small_zh.py --output data/models/bge-small-zh-v1.5",
+    "knowledge:evaluate": "node --no-warnings src/knowledge/evaluation/main.ts",
+    "agent:test": ".venv/bin/python -m unittest discover -s tests/python/agents -t tests/python",
+    "test:python": "npm run agent:test",
+    "test:architecture": "node --test tests/architecture/api-routes.test.mjs",
+    "test:contracts": "node --test tests/contracts/api.contract.test.mjs",
+    "test:sdk": "node --test tests/sdk/*.test.mjs",
+    "test:channels": "node --no-warnings --test tests/channels/*.test.mjs",
+    "verify": "npm run build && npm run test:architecture && npm run test:sdk && npm run test:channels && npm run test:python && npm run test:contracts",
+    "test": "npm run verify",
+    "build": "npm run build --workspace @eido/webui",
+    "start": "npm run start --workspace @eido/webui",
+    "preview": "npm run preview --workspace @eido/webui",
+    "typecheck": "npm run typecheck --workspace @eido/webui",
+    "lint": "eslint --config webui/eslint.config.mjs webui/src src"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5"
+  }
+}

@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>论文阅读助手</title>
+  <style>
+    :root{color-scheme:light;--blue:#3978f6;--ink:#1d2433;--muted:#778196;--line:#e4e8f0;--soft:#f5f7fb}
+    .toolbar{padding-left:64px!important}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:#eef1f7;color:var(--ink);font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif}
+    button{font:inherit}.app{display:flex;height:100%;min-height:420px;flex-direction:column}.toolbar{display:flex;height:58px;flex:none;align-items:center;gap:10px;border-bottom:1px solid var(--line);background:#fff;padding:0 14px}.file-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px}.button{display:inline-flex;height:36px;cursor:pointer;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 13px;color:#465067;font-size:12px;font-weight:700}.button:hover{border-color:#b9c9ef;color:var(--blue)}.button.primary{border-color:var(--blue);background:var(--blue);color:#fff}.button:disabled{cursor:not-allowed;opacity:.5}.workspace{position:relative;display:grid;min-height:0;flex:1;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:10px;padding:10px}.viewer-shell,.analysis{position:relative;z-index:1;min-height:0;overflow:hidden;border:1px solid #dce1eb;border-radius:14px;background:#fff;box-shadow:0 8px 30px rgba(37,48,78,.06)}#pdfViewer{display:none;width:100%;height:100%;overflow:auto;background:#525659;padding:18px}.pdf-page{position:relative;width:max-content;max-width:100%;margin:0 auto 18px;background:#fff;box-shadow:0 3px 16px rgba(0,0,0,.28)}.pdf-page canvas{display:block;max-width:100%;height:auto}.textLayer{position:absolute;inset:0;z-index:2;overflow:clip;line-height:1;text-align:initial;transform-origin:0 0;pointer-events:auto;cursor:text;user-select:text;-webkit-user-select:text;--min-font-size:1;--text-scale-factor:calc(var(--total-scale-factor) * var(--min-font-size));--min-font-size-inv:calc(1 / var(--min-font-size))}.textLayer :is(span,br){position:absolute;color:transparent;white-space:pre;transform-origin:0 0;cursor:text;user-select:text;-webkit-user-select:text}.textLayer ::selection{background:rgba(47,117,255,.34)}.textLayer>.markedContent{display:contents}.textLayer>:not(.markedContent),.textLayer .markedContent span:not(.markedContent){z-index:1;font-size:calc(var(--text-scale-factor) * var(--font-height));transform:rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv))}.source-marker{position:absolute;z-index:4;border-radius:3px;background:rgba(255,197,36,.56);box-shadow:0 0 0 2px rgba(255,197,36,.22);pointer-events:none}.connection-layer{position:absolute;inset:0;z-index:3;width:100%;height:100%;overflow:visible;pointer-events:none}.connection-path{fill:none;stroke:#3978f6;stroke-width:2;stroke-dasharray:5 6;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(255,255,255,.9))}.connection-dot{fill:#3978f6;stroke:#fff;stroke-width:2}.empty{display:flex;height:100%;align-items:center;justify-content:center;padding:28px}.dropzone{display:flex;width:min(560px,100%);min-height:310px;align-items:center;justify-content:center;flex-direction:column;border:1.5px dashed #bdc8da;border-radius:22px;background:linear-gradient(145deg,#fbfcff,#f5f8ff);padding:38px;text-align:center}.dropzone.dragging{border-color:var(--blue);background:#edf3ff}.upload-icon{display:flex;width:70px;height:70px;align-items:center;justify-content:center;border-radius:22px;background:#e8f0ff;color:var(--blue)}.upload-icon svg{width:31px}.dropzone h1{margin:22px 0 8px;font-size:21px}.dropzone p{max-width:390px;margin:0 0 22px;color:var(--muted);font-size:13px;line-height:1.7}.analysis{display:flex;flex-direction:column}.analysis-head{border-bottom:1px solid var(--line);padding:15px 17px}.analysis-head h2{margin:0;font-size:14px}.analysis-head p{margin:5px 0 0;color:var(--muted);font-size:11px}.analysis-body{min-height:0;flex:1;overflow:auto;padding:17px;white-space:pre-wrap;font-size:13px;line-height:1.85}.analysis-claim{margin:0 -7px;padding:5px 7px;border-radius:8px;transition:background .15s,box-shadow .15s}.analysis-claim.has-source{cursor:crosshair}.analysis-claim.has-source:hover,.analysis-claim.has-source:focus{outline:0;background:#edf3ff;box-shadow:inset 3px 0 #3978f6}.source-badge{display:inline-flex;margin:2px 2px 2px 5px;border:1px dashed #6792eb;border-radius:999px;background:#e9f0ff;padding:0 7px;color:#245fce;font-size:10px;font-weight:700;line-height:20px;vertical-align:1px;cursor:crosshair}.source-badge.missing{border-color:#e0a955;background:#fff6df;color:#9a6715}.placeholder{display:flex;height:100%;align-items:center;justify-content:center;color:var(--muted);text-align:center}.status{color:var(--muted);font-size:11px}.status.error{color:#d34242}.hidden{display:none!important}@media(max-width:850px){.workspace{grid-template-columns:1fr;grid-template-rows:minmax(360px,1fr) minmax(240px,.7fr)}.connection-layer{display:none}}
+  </style>
+  <style>
+    .workspace{grid-template-columns:210px minmax(0,1.2fr) minmax(300px,.8fr)}
+    .paper-library{position:relative;z-index:1;display:flex;min-height:0;overflow:hidden;flex-direction:column;border:1px solid #dce1eb;border-radius:14px;background:#fff;box-shadow:0 8px 30px rgba(37,48,78,.06)}
+    .library-head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:14px}
+    .library-head h2{margin:0;font-size:14px}.library-count{color:var(--muted);font-size:10px}
+    .paper-list{min-height:0;flex:1;overflow:auto;padding:8px}
+    .paper-list-empty{padding:24px 10px;color:var(--muted);font-size:11px;line-height:1.7;text-align:center}
+    .paper-item{display:flex;width:100%;align-items:center;border:1px solid transparent;border-radius:10px;background:transparent;transition:background .15s,border-color .15s}
+    .paper-item:hover{background:#f5f8ff}.paper-item.active{border-color:#b9cdf8;background:#edf3ff}
+    .paper-open{min-width:0;flex:1;cursor:pointer;border:0;background:transparent;padding:10px;text-align:left}
+    .paper-remove{display:flex;width:26px;height:26px;flex:none;cursor:pointer;align-items:center;justify-content:center;border:0;border-radius:7px;background:transparent;color:#a0a8b8;font-size:15px;opacity:0;transition:opacity .15s,background .15s,color .15s}
+    .paper-item:hover .paper-remove,.paper-remove:focus,.paper-remove.confirming{opacity:1}.paper-remove:hover,.paper-remove.confirming{background:#fff0f0;color:#d34242}.paper-remove.confirming{width:42px;font-size:10px;font-weight:700}
+    .paper-title{display:block;overflow:hidden;color:#283247;font-size:12px;font-weight:700;line-height:1.45;text-overflow:ellipsis;white-space:nowrap}
+    .paper-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;color:#8a93a5;font-size:9px}
+    .paper-analyzed{display:inline-flex;align-items:center;gap:4px;color:#2f69db}.paper-analyzed::before{width:5px;height:5px;border-radius:50%;background:#3978f6;content:""}
+    .analysis-body{white-space:normal;line-height:1.72}
+    .analysis-body>:first-child{margin-top:0}.analysis-body>:last-child{margin-bottom:0}
+    .analysis-body h1,.analysis-body h2,.analysis-body h3,.analysis-body h4{color:#182033;line-height:1.35}
+    .analysis-body h1{margin:4px 0 16px;font-size:21px}.analysis-body h2{margin:22px 0 10px;padding-bottom:7px;border-bottom:1px solid #e7eaf0;font-size:17px}.analysis-body h3{margin:18px 0 8px;font-size:15px}.analysis-body h4{margin:16px 0 7px;font-size:14px}
+    .analysis-body p{margin:8px 0}.analysis-body ul,.analysis-body ol{margin:8px 0;padding-left:22px}.analysis-body li{margin:4px 0}.analysis-body li>p{margin:2px 0}
+    .analysis-body strong{color:#17213a;font-weight:750}.analysis-body em{color:#4f5e78}
+    .analysis-body blockquote{margin:12px 0;padding:8px 12px;border-left:3px solid #7ea2ee;border-radius:0 8px 8px 0;background:#f4f7ff;color:#52617a}
+    .analysis-body code{border-radius:4px;background:#edf0f5;padding:2px 5px;color:#c23563;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+    .analysis-body pre{overflow:auto;margin:12px 0;border-radius:9px;background:#202636;padding:12px;color:#eef3ff}.analysis-body pre code{background:transparent;padding:0;color:inherit}
+    .analysis-body table{width:100%;margin:12px 0;border-collapse:separate;border-spacing:0;border:1px solid #dfe4ed;border-radius:9px;overflow:hidden;font-size:11px;line-height:1.55}
+    .analysis-body th,.analysis-body td{padding:7px 9px;border-right:1px solid #e5e9f0;border-bottom:1px solid #e5e9f0;text-align:left;vertical-align:top}.analysis-body th{background:#f1f4f9;color:#34415a;font-weight:750}.analysis-body tr:last-child td{border-bottom:0}.analysis-body :is(th,td):last-child{border-right:0}.analysis-body tr:nth-child(even) td{background:#fafbfc}
+    .analysis-body hr{margin:18px 0;border:0;border-top:1px solid #e1e5ed}.analysis-body a{color:#2d69df;text-decoration:none}.analysis-body a:hover{text-decoration:underline}
+    @media(max-width:1100px) and (min-width:851px){.workspace{grid-template-columns:180px minmax(0,1fr);grid-template-rows:minmax(360px,1fr) minmax(240px,.72fr)}.paper-library{grid-row:1/3}.analysis{grid-column:2}.connection-layer{display:none}}
+    @media(max-width:850px){.workspace{grid-template-columns:1fr;grid-template-rows:150px minmax(360px,1fr) minmax(240px,.7fr)}.paper-list{display:flex;gap:7px}.paper-list-empty{width:100%}.paper-item{min-width:180px;width:180px}.paper-library{grid-row:auto}.analysis{grid-column:auto}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <input id="fileInput" type="file" accept="application/pdf,.pdf" hidden>
+    <header class="toolbar">
+      <span class="file-name" id="fileName">尚未选择论文</span>
+      <span class="status" id="status"></span>
+      <button class="button" id="chooseButton" type="button">选择 PDF</button>
+      <button class="button primary" id="analyzeButton" type="button" disabled>一键分析</button>
+    </header>
+    <section class="workspace">
+      <aside class="paper-library" aria-label="已缓存论文">
+        <div class="library-head"><h2>论文缓存库</h2><span class="library-count" id="libraryCount">0 篇</span></div>
+        <div class="paper-list" id="paperList"><div class="paper-list-empty">上传过的论文会保存在这里</div></div>
+      </aside>
+      <div class="viewer-shell" id="viewerShell">
+        <div class="empty" id="emptyState">
+          <div class="dropzone" id="dropzone">
+            <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h4M9 15l3-3 3 3m-3-3v7"/></svg></div>
+            <h1>打开一篇论文</h1>
+            <p>选择本地 PDF 后即可阅读。点击“一键分析”时，论文会通过 SiinX 的项目能力接口交给你的 Agent。</p>
+            <button class="button primary" id="emptyUploadButton" type="button">上传本地 PDF</button>
+          </div>
+        </div>
+        <div id="pdfViewer" aria-label="PDF 论文预览"></div>
+      </div>
+      <aside class="analysis">
+        <div class="analysis-head"><h2>SiinX Agent 分析</h2><p>分析能力由 SiinX 通用 Project API 提供，本项目不持有账号或模型密钥。</p></div>
+        <div class="analysis-body placeholder" id="analysisBody">选择论文后点击“一键分析”</div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    window.markdownReady=Promise.all([
+      import('./vendor/marked.esm.js'),
+      import('./vendor/purify.es.mjs')
+    ]).then(([markedModule,purifyModule])=>{
+      window.marked=markedModule.marked;
+      window.DOMPurify=purifyModule.default(window);
+      document.documentElement.dataset.markdownReady='true';
+    }).catch(error=>{
+      document.documentElement.dataset.markdownReady='false';
+      console.error('Markdown components failed to load',error);
+      throw error;
+    });
+  </script>
+  <script>
+    const pending=new Map();
+    function callEido(capability,payload,transfer=[]){
+      const requestId=`req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      return new Promise((resolve,reject)=>{
+        const timer=setTimeout(()=>{pending.delete(requestId);reject(new Error('SiinX 能力调用超时'))},180000);
+        pending.set(requestId,{resolve,reject,timer});
+        window.parent.postMessage({type:'eido:project-request',requestId,capability,payload},'*',transfer);
+      });
+    }
+    function publishProjectContext(){
+      const pages=pageTextMaps.filter(Boolean).map((page,index)=>`[第${index+1}页]\n${page.textItems.join(' ')}`);
+      window.parent.postMessage({type:'eido:project-context',context:{
+        kind:'document',title:currentFile?.name||'论文阅读器',content:pages.join('\n\n').slice(0,120000),
+        metadata:{mimeType:currentFile?.type||'',pageCount:pages.length,hasAnalysis:Boolean(currentAnalysis)}
+      }},'*');
+    }
+    window.addEventListener('message',event=>{
+      if(event.source!==window.parent)return;
+      if(event.data?.type==='eido:project-context-request'){publishProjectContext();return}
+      if(event.data?.type!=='eido:project-response')return;
+      const task=pending.get(event.data.requestId);if(!task)return;
+      clearTimeout(task.timer);pending.delete(event.data.requestId);
+      if(event.data.ok)task.resolve(event.data.result);else task.reject(new Error(event.data.error||'SiinX 能力调用失败'));
+    });
+
+    const fileInput=document.querySelector('#fileInput');
+    const chooseButton=document.querySelector('#chooseButton');
+    const emptyUploadButton=document.querySelector('#emptyUploadButton');
+    const analyzeButton=document.querySelector('#analyzeButton');
+    const dropzone=document.querySelector('#dropzone');
+    const emptyState=document.querySelector('#emptyState');
+    const pdfViewer=document.querySelector('#pdfViewer');
+    const fileName=document.querySelector('#fileName');
+    const status=document.querySelector('#status');
+    const analysisBody=document.querySelector('#analysisBody');
+    const paperList=document.querySelector('#paperList');
+    const libraryCount=document.querySelector('#libraryCount');
+    const CACHE_DB_NAME='eido-paper-reader-cache';
+    const CACHE_STORE_NAME='papers';
+    const LAST_PAPER_KEY='eido-paper-reader-last-paper';
+    const HOST_STORAGE_KEY='paper-library-v1';
+    const IS_HOSTED=window.parent!==window;
+    const LEGACY_DB_NAME='eido-paper-reader';
+    const LEGACY_STORE_NAME='papers';
+    const LEGACY_ACTIVE_KEY='active-paper';
+    let currentFile=null,currentPaperId='',currentAnalysis='',currentRenderToken=0,sessionId='';
+    let pageTextMaps=[],activeSourceMarkers=[],sourceHighlightToken=0;
+
+    function chooseFile(){fileInput.click()}
+    function setStatus(message,isError=false){status.textContent=message;status.classList.toggle('error',isError)}
+    function openCache(){
+      return new Promise((resolve,reject)=>{
+        const request=indexedDB.open(CACHE_DB_NAME,1);
+        request.onupgradeneeded=()=>{
+          const db=request.result;
+          if(!db.objectStoreNames.contains(CACHE_STORE_NAME)){
+            const store=db.createObjectStore(CACHE_STORE_NAME,{keyPath:'id'});
+            store.createIndex('updatedAt','updatedAt');
+          }
+        };
+        request.onsuccess=()=>resolve(request.result);
+        request.onerror=()=>reject(request.error||new Error('无法打开论文缓存'));
+      });
+    }
+    async function cacheRequest(mode,operation){
+      const db=await openCache();
+      try{
+        return await new Promise((resolve,reject)=>{
+          const transaction=db.transaction(CACHE_STORE_NAME,mode);
+          const store=transaction.objectStore(CACHE_STORE_NAME);
+          const request=operation(store);
+          request.onsuccess=()=>resolve(request.result);
+          request.onerror=()=>reject(request.error||new Error('论文缓存操作失败'));
+        });
+      }finally{db.close()}
+    }
+    function makePaperId(file){
+      return `paper:${file.name}:${file.size}:${file.lastModified||0}`;
+    }
+    function getLocalLastPaper(){
+      try{return localStorage.getItem(LAST_PAPER_KEY)||''}catch{return ''}
+    }
+    function setLocalLastPaper(id){
+      try{id?localStorage.setItem(LAST_PAPER_KEY,id):localStorage.removeItem(LAST_PAPER_KEY)}catch{}
+    }
+    async function getCachedPapers(){
+      if(!IS_HOSTED)return cacheRequest('readonly',store=>store.getAll());
+      const result=await callEido('project.storage',{action:'get',key:HOST_STORAGE_KEY});
+      return Array.isArray(result?.value)?result.value:[];
+    }
+    async function getCachedPaper(id){
+      const records=await getCachedPapers();
+      return records.find(record=>record?.id===id);
+    }
+    async function putCachedPaper(record){
+      if(!IS_HOSTED)return cacheRequest('readwrite',store=>store.put(record));
+      let storedFileName=record.storedFileName||'';
+      let filePath=record.filePath||'';
+      if(!storedFileName){
+        const bytes=await record.blob.arrayBuffer();
+        const cacheName=`${record.size}-${record.lastModified}-${record.name}`;
+        const saved=await callEido('project.files',{
+          action:'save',fileName:cacheName,mimeType:record.type||'application/pdf',data:bytes
+        },[bytes]);
+        storedFileName=saved.fileName;filePath=saved.filePath;
+      }
+      const records=await getCachedPapers();
+      const metadata={...record,blob:undefined,storedFileName,filePath};
+      const next=[metadata,...records.filter(item=>item?.id!==record.id)];
+      await callEido('project.storage',{action:'set',key:HOST_STORAGE_KEY,value:next});
+      return record.id;
+    }
+    async function deleteCachedPaper(id){
+      if(!IS_HOSTED)return cacheRequest('readwrite',store=>store.delete(id));
+      const records=await getCachedPapers();
+      const record=records.find(item=>item?.id===id);
+      await callEido('project.storage',{
+        action:'set',key:HOST_STORAGE_KEY,value:records.filter(item=>item?.id!==id)
+      });
+      if(record?.storedFileName){
+        await callEido('project.files',{action:'remove',fileName:record.storedFileName}).catch(error=>{
+          console.warn('Cached PDF cleanup failed',error);
+        });
+      }
+    }
+    function getLegacyCachedPaper(){
+      return new Promise(resolve=>{
+        const request=indexedDB.open(LEGACY_DB_NAME);
+        request.onerror=()=>resolve(null);
+        request.onsuccess=()=>{
+          const db=request.result;
+          if(!db.objectStoreNames.contains(LEGACY_STORE_NAME)){db.close();resolve(null);return}
+          const getRequest=db.transaction(LEGACY_STORE_NAME,'readonly').objectStore(LEGACY_STORE_NAME).get(LEGACY_ACTIVE_KEY);
+          getRequest.onsuccess=()=>{db.close();resolve(getRequest.result||null)};
+          getRequest.onerror=()=>{db.close();resolve(null)};
+        };
+      });
+    }
+    async function migrateLegacyCache(){
+      if(IS_HOSTED)return;
+      try{
+        const legacy=await getLegacyCachedPaper();
+        if(!(legacy instanceof Blob))return;
+        const name=legacy.name||'已缓存论文.pdf';
+        const file=legacy instanceof File?legacy:new File([legacy],name,{type:legacy.type||'application/pdf'});
+        const id=makePaperId(file);
+        if(await getCachedPaper(id))return;
+        const now=Date.now();
+        await putCachedPaper({
+          id,name:file.name,type:file.type||'application/pdf',size:file.size,lastModified:file.lastModified||0,
+          blob:file,analysis:'',sessionId:'',createdAt:now,updatedAt:now
+        });
+        if(!getLocalLastPaper())setLocalLastPaper(id);
+      }catch(error){console.warn('Legacy paper cache migration failed',error)}
+    }
+    function formatCacheTime(value){
+      if(!value)return '';
+      const date=new Date(value);
+      const today=new Date();
+      if(date.toDateString()===today.toDateString())return date.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+      return date.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'});
+    }
+    async function renderPaperLibrary(){
+      try{
+        const records=(await getCachedPapers()).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+        libraryCount.textContent=`${records.length} 篇`;
+        paperList.replaceChildren();
+        if(!records.length){
+          const empty=document.createElement('div');
+          empty.className='paper-list-empty';empty.textContent='上传过的论文会保存在这里';
+          paperList.append(empty);return records;
+        }
+        records.forEach(record=>{
+          const item=document.createElement('div');
+          item.className=`paper-item${record.id===currentPaperId?' active':''}`;
+          item.dataset.paperId=record.id;
+          const button=document.createElement('button');
+          button.type='button';button.className='paper-open';
+          const title=document.createElement('span');
+          title.className='paper-title';title.textContent=record.name;title.title=record.name;
+          const meta=document.createElement('span');
+          meta.className='paper-meta';
+          const state=document.createElement('span');
+          state.className=record.analysis?'paper-analyzed':'';
+          state.textContent=record.analysis?'已分析':'待分析';
+          const time=document.createElement('span');
+          time.textContent=formatCacheTime(record.updatedAt);
+          meta.append(state,time);button.append(title,meta);
+          button.addEventListener('click',()=>openCachedPaper(record.id));
+          const remove=document.createElement('button');
+          remove.type='button';remove.className='paper-remove';remove.textContent='×';
+          remove.title=`移除 ${record.name}`;remove.setAttribute('aria-label',`移除 ${record.name}`);
+          remove.addEventListener('click',()=>removePaper(record,remove));
+          item.append(button,remove);paperList.append(item);
+        });
+        return records;
+      }catch(error){
+        console.error('Paper cache list failed',error);
+        libraryCount.textContent='缓存不可用';
+        return [];
+      }
+    }
+    async function saveCurrentPaper(){
+      if(!currentFile||!currentPaperId)return false;
+      try{
+        const existing=await getCachedPaper(currentPaperId);
+        const now=Date.now();
+        await putCachedPaper({
+          id:currentPaperId,
+          name:currentFile.name,
+          type:currentFile.type||'application/pdf',
+          size:currentFile.size,
+          lastModified:currentFile.lastModified||0,
+          blob:currentFile,
+          storedFileName:existing?.storedFileName||'',
+          filePath:existing?.filePath||'',
+          analysis:currentAnalysis||existing?.analysis||'',
+          sessionId:sessionId||existing?.sessionId||'',
+          createdAt:existing?.createdAt||now,
+          updatedAt:now
+        });
+        setLocalLastPaper(currentPaperId);
+        await renderPaperLibrary();
+        return true;
+      }catch(error){
+        console.error('Paper cache save failed',error);
+        return false;
+      }
+    }
+    function resetReader(){
+      currentFile=null;currentPaperId='';currentAnalysis='';sessionId='';
+      ++currentRenderToken;clearSourceHighlight();pageTextMaps=[];
+      pdfViewer.replaceChildren();pdfViewer.style.display='none';emptyState.classList.remove('hidden');
+      fileName.textContent='尚未选择论文';setStatus('');analyzeButton.disabled=true;
+      analysisBody.className='analysis-body placeholder';analysisBody.textContent='选择论文后点击“一键分析”';
+    }
+    async function removePaper(record,button){
+      if(!button.dataset.confirming){
+        button.dataset.confirming='true';button.classList.add('confirming');
+        button.textContent='确定';button.setAttribute('aria-label',`确认移除 ${record.name}`);
+        window.setTimeout(()=>{
+          if(!button.isConnected)return;
+          delete button.dataset.confirming;button.classList.remove('confirming');
+          button.textContent='×';button.setAttribute('aria-label',`移除 ${record.name}`);
+        },8000);
+        return;
+      }
+      try{
+        await deleteCachedPaper(record.id);
+        if(getLocalLastPaper()===record.id)setLocalLastPaper('');
+        if(currentPaperId===record.id)resetReader();
+        const records=await renderPaperLibrary();
+        if(!currentFile&&records[0])await openCachedPaper(records[0].id);
+      }catch(error){
+        setStatus(error instanceof Error?`移除缓存失败：${error.message}`:'移除缓存失败',true);
+      }
+    }
+    async function openCachedPaper(id){
+      if(!id||id===currentPaperId)return;
+      setStatus('正在读取缓存…');
+      try{
+        const record=await getCachedPaper(id);
+        if(!record)throw new Error('缓存记录不存在');
+        let blob=record.blob;
+        if(!blob&&record.storedFileName){
+          const loaded=await callEido('project.files',{action:'read',fileName:record.storedFileName});
+          blob=new Blob([loaded.data],{type:record.type||loaded.mimeType||'application/pdf'});
+        }
+        if(!blob)throw new Error('缓存 PDF 不存在');
+        const file=new File([blob],record.name,{type:record.type||'application/pdf',lastModified:record.lastModified||0});
+        await openPdf(file,{paperId:record.id,analysis:record.analysis||'',sessionId:record.sessionId||'',fromCache:true});
+      }catch(error){
+        setStatus(error instanceof Error?`读取缓存失败：${error.message}`:'读取缓存失败',true);
+      }
+    }
+    async function openPdf(file,options={}){
+      if(!file)return;
+      if(file.type!=='application/pdf'&&!file.name.toLowerCase().endsWith('.pdf')){setStatus('请选择 PDF 文件',true);return}
+      const paperId=options.paperId||makePaperId(file);
+      setStatus('正在打开 PDF…');fileName.textContent=file.name;analyzeButton.disabled=true;
+      let previous=null;
+      if(!options.fromCache){
+        try{previous=await getCachedPaper(paperId)}catch(error){console.error('Paper cache lookup failed',error)}
+      }
+      currentFile=file;
+      currentPaperId=paperId;
+      currentAnalysis=options.analysis??previous?.analysis??'';
+      sessionId=options.sessionId??previous?.sessionId??'';
+      setLocalLastPaper(currentPaperId);
+      setStatus('');fileName.textContent=file.name;analyzeButton.disabled=false;
+      const renderToken=++currentRenderToken;
+      clearSourceHighlight();pageTextMaps=[];pdfViewer.replaceChildren();pdfViewer.style.display='block';emptyState.classList.add('hidden');
+      setStatus('正在载入 PDF…');
+      analysisBody.className='analysis-body placeholder';
+      analysisBody.textContent=currentAnalysis?'正在恢复上次分析…':'点击“一键分析”让 SiinX Agent 解读当前论文';
+      await renderPaperLibrary();
+      try{
+        const pdfjs=await import('./vendor/pdf.min.mjs');
+        pdfjs.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf.worker.min.mjs',location.href).href;
+        const documentTask=pdfjs.getDocument({data:await file.arrayBuffer()});
+        const pdf=await documentTask.promise;
+        for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber+=1){
+          if(renderToken!==currentRenderToken){documentTask.destroy();return}
+          const page=await pdf.getPage(pageNumber);
+          const baseViewport=page.getViewport({scale:1});
+          const availableWidth=Math.max(320,pdfViewer.clientWidth-36);
+          const viewport=page.getViewport({scale:Math.min(2,availableWidth/baseViewport.width)});
+          const outputScale=Math.min(window.devicePixelRatio||1,2);
+          const pageElement=document.createElement('div');
+          pageElement.className='pdf-page';
+          pageElement.dataset.pageNumber=String(pageNumber);
+          const canvas=document.createElement('canvas');
+          canvas.width=Math.floor(viewport.width*outputScale);
+          canvas.height=Math.floor(viewport.height*outputScale);
+          canvas.style.width=`${Math.floor(viewport.width)}px`;
+          canvas.style.height=`${Math.floor(viewport.height)}px`;
+          pageElement.style.width=`${Math.floor(viewport.width)}px`;
+          pageElement.style.height=`${Math.floor(viewport.height)}px`;
+          const textLayerElement=document.createElement('div');
+          textLayerElement.className='textLayer';
+          pageElement.append(canvas,textLayerElement);
+          pdfViewer.append(pageElement);
+          await page.render({canvasContext:canvas.getContext('2d'),viewport,transform:outputScale===1?null:[outputScale,0,0,outputScale,0,0]}).promise;
+          const textContent=await page.getTextContent({includeMarkedContent:true,disableNormalization:true});
+          const textLayer=new pdfjs.TextLayer({textContentSource:textContent,container:textLayerElement,viewport});
+          await textLayer.render();
+          pageTextMaps[pageNumber]={pageElement,textDivs:textLayer.textDivs,textItems:textLayer.textContentItemsStr};
+        }
+        if(renderToken===currentRenderToken){
+          publishProjectContext();
+          if(currentAnalysis)await renderAnalysis(currentAnalysis);
+          if(!options.fromCache){
+            const cached=await saveCurrentPaper();
+            setStatus(cached?`${pdf.numPages} 页`:`${pdf.numPages} 页 · 缓存失败`,!cached);
+          }else{
+            await renderPaperLibrary();
+            setStatus(`${pdf.numPages} 页 · 已从缓存恢复`);
+          }
+        }
+      }catch(error){
+        if(renderToken!==currentRenderToken)return;
+        pdfViewer.style.display='none';emptyState.classList.remove('hidden');
+        setStatus(error instanceof Error?`PDF 载入失败：${error.message}`:'PDF 载入失败',true);
+      }
+    }
+    async function analyze(){
+      if(!currentFile)return;
+      analyzeButton.disabled=true;setStatus('正在交给 Agent 分析…');
+      analysisBody.className='analysis-body placeholder';analysisBody.textContent='SiinX Agent 正在阅读和分析论文，请稍候…';
+      try{
+        const bytes=await currentFile.arrayBuffer();
+        const saved=await callEido('project.files',{fileName:currentFile.name,mimeType:currentFile.type||'application/pdf',data:bytes},[bytes]);
+        const result=await callEido('agent.chat',{
+          sessionId,
+          message:'请分析当前论文。说明它解决的问题、核心创新和主要方法，并给出简洁结论。请使用适合论文分析的工具或技能。每个重要结论单独成行，并在该行末尾附上且只附上一个格式为【第N页：原文短句】的原文锚点；原文短句必须逐字摘自对应 PDF 页面，建议 8–30 个字，不能改写或翻译。',
+          context:{kind:'document',title:currentFile.name,filePath:saved.filePath,metadata:{mimeType:'application/pdf'}}
+        });
+        sessionId=result.sessionId||sessionId;
+        currentAnalysis=result.content||'Agent 没有返回分析内容';
+        publishProjectContext();
+        await renderAnalysis(currentAnalysis);
+        const cached=await saveCurrentPaper();
+        setStatus(cached?'分析完成':'分析完成 · 缓存失败',!cached);
+      }catch(error){
+        analysisBody.className='analysis-body placeholder';analysisBody.textContent=error instanceof Error?error.message:'分析失败';
+        setStatus('分析失败',true);
+      }finally{analyzeButton.disabled=false}
+    }
+    function normalizeSourceText(value){
+      return String(value||'').normalize('NFKC').toLocaleLowerCase().replace(/[\s\u00ad\u200b-\u200d\ufeff'"“”‘’`.,，。:：;；!?！？、()[\]{}<>《》【】—–_-]/g,'');
+    }
+    function findSource(pageNumber,quote){
+      const pageMap=pageTextMaps[pageNumber];if(!pageMap)return null;
+      const normalizedQuote=normalizeSourceText(quote);if(!normalizedQuote)return null;
+      let joined='',ranges=[];
+      pageMap.textItems.forEach((text,index)=>{
+        const normalized=normalizeSourceText(text);
+        const start=joined.length;joined+=normalized;ranges.push({index,start,end:joined.length});
+      });
+      let start=joined.indexOf(normalizedQuote);
+      let matchLength=normalizedQuote.length;
+      if(start<0&&normalizedQuote.length>12){
+        const fragment=normalizedQuote.slice(0,Math.max(10,Math.floor(normalizedQuote.length*.65)));
+        start=joined.indexOf(fragment);matchLength=fragment.length;
+      }
+      if(start<0)return null;
+      const end=start+matchLength;
+      const spans=ranges.filter(range=>range.end>start&&range.start<end).map(range=>pageMap.textDivs[range.index]).filter(Boolean);
+      return spans.length?{pageElement:pageMap.pageElement,spans}:null;
+    }
+    async function renderAnalysis(content){
+      clearSourceHighlight();analysisBody.className='analysis-body';analysisBody.replaceChildren();
+      const references=[];
+      const anchorPattern=/【第\s*(\d+)(?:\s*[-–—~至]\s*\d+)?\s*页(?:\s*[：:,，]\s*|\s+)([^】]+)】/g;
+      const markdown=String(content).replace(anchorPattern,(_,page,quote)=>{
+        const index=references.push({pageNumber:Number(page),quote:String(quote).trim()})-1;
+        return `EIDOREF${index}TOKEN`;
+      });
+      try{await window.markdownReady}catch(error){console.error('Markdown components failed to load',error)}
+      if(!window.marked||!window.DOMPurify){
+        analysisBody.textContent=String(content);
+        setStatus('Markdown 渲染组件加载失败',true);
+        return;
+      }
+      const rendered=window.marked.parse(markdown,{gfm:true,breaks:true});
+      analysisBody.innerHTML=window.DOMPurify.sanitize(rendered,{USE_PROFILES:{html:true}});
+      analysisBody.querySelectorAll('a').forEach(link=>{link.target='_blank';link.rel='noopener noreferrer'});
+
+      const textNodes=[];
+      const walker=document.createTreeWalker(analysisBody,NodeFilter.SHOW_TEXT);
+      while(walker.nextNode())if(/EIDOREF\d+TOKEN/.test(walker.currentNode.nodeValue||''))textNodes.push(walker.currentNode);
+      textNodes.forEach(textNode=>{
+        const fragment=document.createDocumentFragment();
+        const value=textNode.nodeValue||'';
+        const tokenPattern=/EIDOREF(\d+)TOKEN/g;
+        let cursor=0,match;
+        while((match=tokenPattern.exec(value))){
+          fragment.append(document.createTextNode(value.slice(cursor,match.index)));
+          const reference=references[Number(match[1])];
+          const source=findSource(reference.pageNumber,reference.quote);
+          const badge=document.createElement('span');
+          badge.className=`source-badge${source?'':' missing'}`;
+          badge.textContent=source?`第 ${reference.pageNumber} 页 · 查看原文`:`第 ${reference.pageNumber} 页 · 引用待定位`;
+          badge.title=reference.quote;
+          badge.dataset.referenceIndex=match[1];
+          fragment.append(badge);
+          cursor=tokenPattern.lastIndex;
+        }
+        fragment.append(document.createTextNode(value.slice(cursor)));
+        textNode.replaceWith(fragment);
+      });
+      analysisBody.querySelectorAll('.source-badge[data-reference-index]').forEach(badge=>{
+        const reference=references[Number(badge.dataset.referenceIndex)];
+        const source=findSource(reference.pageNumber,reference.quote);
+        if(source){
+          badge.tabIndex=0;
+          badge.addEventListener('mouseenter',()=>activateSourceHighlight(source));
+          badge.addEventListener('mouseleave',clearSourceHighlight);
+          badge.addEventListener('focus',()=>activateSourceHighlight(source));
+          badge.addEventListener('blur',clearSourceHighlight);
+        }
+      });
+    }
+    function activateSourceHighlight(source){
+      clearSourceHighlight();
+      const highlightToken=sourceHighlightToken;
+      const targetTop=source.pageElement.offsetTop-(pdfViewer.clientHeight-source.pageElement.offsetHeight)/2;
+      pdfViewer.scrollTop=Math.max(0,targetTop);
+      window.requestAnimationFrame(()=>{
+        if(highlightToken!==sourceHighlightToken)return;
+        const pageRect=source.pageElement.getBoundingClientRect();
+        const rects=source.spans.map(span=>span.getBoundingClientRect()).filter(rect=>rect.width>0&&rect.height>0);
+        rects.forEach(rect=>{
+          const marker=document.createElement('div');
+          marker.className='source-marker';
+          marker.style.left=`${rect.left-pageRect.left-2}px`;
+          marker.style.top=`${rect.top-pageRect.top-1}px`;
+          marker.style.width=`${rect.width+4}px`;
+          marker.style.height=`${rect.height+2}px`;
+          source.pageElement.append(marker);
+          activeSourceMarkers.push(marker);
+        });
+      });
+    }
+    function clearSourceHighlight(){
+      sourceHighlightToken+=1;
+      activeSourceMarkers.forEach(marker=>marker.remove());
+      activeSourceMarkers=[];
+    }
+    chooseButton.addEventListener('click',chooseFile);emptyUploadButton.addEventListener('click',chooseFile);
+    fileInput.addEventListener('change',async()=>{
+      const file=fileInput.files?.[0];
+      fileInput.value='';
+      if(!file)return;
+      try{await openPdf(file)}catch(error){
+        setStatus(error instanceof Error?`PDF 打开失败：${error.message}`:'PDF 打开失败',true);
+      }
+    });
+    analyzeButton.addEventListener('click',analyze);
+    ['dragenter','dragover'].forEach(name=>dropzone.addEventListener(name,event=>{event.preventDefault();dropzone.classList.add('dragging')}));
+    ['dragleave','drop'].forEach(name=>dropzone.addEventListener(name,event=>{event.preventDefault();dropzone.classList.remove('dragging')}));
+    dropzone.addEventListener('drop',event=>openPdf(event.dataTransfer.files[0]));
+    (async()=>{
+      await migrateLegacyCache();
+      const records=await renderPaperLibrary();
+      const lastPaperId=getLocalLastPaper();
+      const initial=records.find(record=>record.id===lastPaperId)||records[0];
+      if(initial)await openCachedPaper(initial.id);
+    })();
+  </script>
+</body>
+</html>

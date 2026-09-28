@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kokoro 文本转语音"
+  short_description: "使用本地 Kokoro 模型把文字稳定合成为 WAV 语音文件，并先检查环境"
+  default_prompt: "使用 $kokoro-text-to-speech 将以下文字生成 WAV 语音："

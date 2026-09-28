@@ -1,0 +1,98 @@
+<h2>设计 · 第 2 部分：播放器引擎</h2>
+<p class="subtitle">player.js / player.css / template.html 的职责</p>
+
+<div class="section">
+  <h3>播放器界面布局</h3>
+  <div class="mockup">
+    <div class="mockup-header">播放器 UI 结构</div>
+    <div class="mockup-body" style="padding: 0; background: #0d0d0d; border-radius: 0 0 8px 8px; overflow: hidden;">
+      <!-- Simulated player -->
+      <div style="position: relative; aspect-ratio: 16/9; background: #1a1a2e; display: flex; flex-direction: column;">
+        <!-- Scene area -->
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+          <div style="text-align: center; color: #fff; opacity: 0.8;">
+            <div style="font-size: 48px; margin-bottom: 12px;">🎬</div>
+            <div style="font-size: 14px;">场景动画区域</div>
+            <div style="font-size: 12px; opacity: 0.5; margin-top: 4px;">Canvas / CSS / SVG 动画在这里渲染</div>
+          </div>
+          <!-- Subtitle overlay -->
+          <div style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 8px 20px; border-radius: 6px; font-size: 15px; max-width: 80%; text-align: center;">
+            这是当前场景的字幕文本...
+          </div>
+        </div>
+        <!-- Controls bar -->
+        <div style="background: #16162a; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="color: #fff; font-size: 13px; cursor: pointer;">⏮</div>
+          <div style="color: #fff; font-size: 16px; cursor: pointer;">▶</div>
+          <div style="color: #fff; font-size: 13px; cursor: pointer;">⏭</div>
+          <div style="color: #aaa; font-size: 12px; margin-left: 4px;">01:23 / 03:45</div>
+          <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 8px; position: relative;">
+            <div style="width: 35%; height: 100%; background: #7ecb76; border-radius: 2px;"></div>
+          </div>
+          <div style="color: #aaa; font-size: 13px; cursor: pointer;">🔊</div>
+          <div style="color: #aaa; font-size: 13px; cursor: pointer;">⛶</div>
+          <div style="color: #aaa; font-size: 12px; cursor: pointer;">1x</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>引擎职责清单</h3>
+</div>
+
+<div class="split">
+  <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+    <h4 style="margin-top: 0;">player.js — 核心逻辑</h4>
+    <ul style="font-size: 14px; line-height: 1.8; padding-left: 18px; margin-bottom: 0;">
+      <li><strong>时间线管理</strong>：按 scenes 数组顺序播放，自动计算总时长</li>
+      <li><strong>场景切换</strong>：在当前场景结束前触发转场动画（fade/slide/zoom）</li>
+      <li><strong>音频同步</strong>：每个场景开始时播放对应 WAV，场景结束时停止</li>
+      <li><strong>字幕同步</strong>：根据音频播放进度逐字/逐句显示字幕</li>
+      <li><strong>播放控制</strong>：播放/暂停、上一场景/下一场景、进度条拖拽</li>
+      <li><strong>倍速播放</strong>：0.5x / 1x / 1.5x / 2x</li>
+      <li><strong>全屏</strong>：Fullscreen API</li>
+      <li><strong>键盘快捷键</strong>：空格=暂停，←→=跳转场景</li>
+    </ul>
+  </div>
+  <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+    <h4 style="margin-top: 0;">player.css — 样式</h4>
+    <ul style="font-size: 14px; line-height: 1.8; padding-left: 18px; margin-bottom: 0;">
+      <li>播放器容器：16:9 黑色背景</li>
+      <li>控制栏：半透明深色底栏</li>
+      <li>字幕样式：底部居中，黑底白字</li>
+      <li>转场动画：fade/slide/zoom 的 CSS 实现</li>
+      <li>加载状态：初始 loading 动画</li>
+      <li>响应式：自适应窗口大小</li>
+    </ul>
+    <h4 style="margin-top: 20px;">template.html — 骨架</h4>
+    <ul style="font-size: 14px; line-height: 1.8; padding-left: 18px; margin-bottom: 0;">
+      <li>引入 player.css + player.js</li>
+      <li>提供播放器 DOM 结构</li>
+      <li>预留 scenes 数据注入点</li>
+      <li>所有场景内容内联在 HTML 中</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>转场效果</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+    <div style="background: var(--bg-secondary); padding: 14px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 24px; margin-bottom: 4px;">🌑</div>
+      <strong>Fade</strong>
+      <div style="font-size: 12px; color: var(--text-secondary);">淡入淡出，通用场景切换</div>
+    </div>
+    <div style="background: var(--bg-secondary); padding: 14px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 24px; margin-bottom: 4px;">↔</div>
+      <strong>Slide</strong>
+      <div style="font-size: 12px; color: var(--text-secondary);">左右滑动，适合流程推进</div>
+    </div>
+    <div style="background: var(--bg-secondary); padding: 14px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 24px; margin-bottom: 4px;">🔍</div>
+      <strong>Zoom</strong>
+      <div style="font-size: 12px; color: var(--text-secondary);">缩放，适合强调/聚焦</div>
+    </div>
+  </div>
+</div>

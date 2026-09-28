@@ -1,0 +1,65 @@
+<h2>设计 · 第 3 部分：SKILL.md 指令设计</h2>
+<p class="subtitle">Agent 执行这个 skill 时要遵循的完整流程</p>
+
+<div class="section">
+  <h3>SKILL.md 核心内容</h3>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+    <h4 style="margin-top: 0;">1. 触发条件</h4>
+    <p style="margin-bottom: 0; font-size: 14px;">用户说"做动画"、"生成动画"、"把这段文字做成动画"、"做一个XX的演示动画"等</p>
+  </div>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+    <h4 style="margin-top: 0;">2. 确认最小信息（缺省直接采用）</h4>
+    <ul style="font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+      <li><strong>风格</strong>：缺省"现代简约、深色背景"</li>
+      <li><strong>画幅</strong>：缺省 16:9</li>
+      <li><strong>时长</strong>：缺省 Agent 根据故事长度自动判断</li>
+      <li><strong>语言</strong>：缺省跟随用户输入语言</li>
+    </ul>
+  </div>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+    <h4 style="margin-top: 0;">3. 场景拆分指南</h4>
+    <ul style="font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+      <li>按叙事节奏拆分：开头 → 展开 → 高潮 → 结尾</li>
+      <li>每场景 1 个核心信息点，旁白控制在 2-4 句</li>
+      <li>每场景建议时长 3-15 秒</li>
+      <li>标注每场景的视觉描述和建议动画类型</li>
+    </ul>
+  </div>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+    <h4 style="margin-top: 0;">4. 动画类型选择指南</h4>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+      <div><strong>粒子效果</strong> → 烟花、星空、雨雪、魔法</div>
+      <div><strong>CSS 动画</strong> → 元素入场、弹跳、强调</div>
+      <div><strong>Canvas</strong> → 波形图、数据可视化、绘画</div>
+      <div><strong>SVG</strong> → 图标动效、路径描边、logo</div>
+      <div><strong>3D/WebGL</strong> → 产品旋转、空间展示</div>
+      <div><strong>文字动画</strong> → 打字机、标题大屏、逐字</div>
+      <div><strong>物理模拟</strong> → 重力、碰撞、弹性</div>
+    </div>
+  </div>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+    <h4 style="margin-top: 0;">5. 组装与输出</h4>
+    <ul style="font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+      <li>读取 player/template.html 骨架</li>
+      <li>将 scenes 数据 + 场景 HTML 注入模板</li>
+      <li>音频文件放在输出目录的 audio/ 子目录</li>
+      <li>单场景 → 单个 HTML；多场景+音频 → 目录输出</li>
+      <li>默认输出到 workspace/html-animation/</li>
+    </ul>
+  </div>
+
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px;">
+    <h4 style="margin-top: 0;">6. TTS 集成</h4>
+    <ul style="font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+      <li>每场景旁白调用 kokoro-text-to-speech 生成 WAV</li>
+      <li>使用 zf_xiaobei 中文语音，默认语速 1.0</li>
+      <li>音频文件名：scene-{index}.wav</li>
+      <li>音频时长作为该场景的 duration</li>
+    </ul>
+  </div>
+</div>

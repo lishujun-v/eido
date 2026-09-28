@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Animation</title>
+<style>
+/* ============================================
+   INLINE: player.css
+   ============================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.player {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  background: #1a1a2e;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.scene-container {
+  position: absolute;
+  inset: 0;
+  bottom: 48px;
+  overflow: hidden;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.scene-layer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scene-layer.transition-fade-in  { opacity: 0; transform: none; }
+.scene-layer.transition-fade-out { opacity: 0; transform: none; }
+.scene-layer.transition-slide-in  { opacity: 0; transform: translateX(60px); }
+.scene-layer.transition-slide-out { opacity: 0; transform: translateX(-60px); }
+.scene-layer.transition-zoom-in   { opacity: 0; transform: scale(0.85); }
+.scene-layer.transition-zoom-out  { opacity: 0; transform: scale(1.1); }
+
+.subtitle-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-size: 15px;
+  max-width: 82%;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  transition: opacity 0.25s ease;
+  z-index: 10;
+}
+
+.subtitle-overlay:empty { opacity: 0; }
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(22, 22, 42, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  z-index: 20;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.controls button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.controls button:active { color: #fff; background: rgba(255,255,255,0.14); }
+.controls .btn-play { font-size: 17px; }
+
+.controls .time-display {
+  color: #aaa;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 92px;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.progress-bar:hover { height: 7px; }
+
+.progress-fill {
+  height: 100%;
+  background: #7ecb76;
+  border-radius: 3px;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+.progress-bar:hover .progress-fill { background: #8fd988; }
+
+.progress-thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.progress-bar:hover .progress-thumb { opacity: 1; }
+
+.speed-badge {
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 32px;
+  text-align: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.speed-badge:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.4s ease;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,0.12);
+  border-top-color: #7ecb76;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  color: #888;
+  font-size: 13px;
+  margin-top: 14px;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+  .player { border-radius: 0; max-width: 100%; }
+  .subtitle-overlay { font-size: 13px; padding: 6px 14px; bottom: 10px; }
+  .controls { height: 40px; padding: 0 8px; gap: 4px; }
+  .controls button { width: 26px; height: 26px; font-size: 13px; }
+  .controls .time-display { font-size: 11px; min-width: 76px; }
+}
+
+@media (max-width: 480px) {
+  .subtitle-overlay { font-size: 12px; bottom: 6px; max-width: 92%; }
+}
+</style>
+</head>
+<body>
+
+<div class="player">
+  <!-- Loading -->
+  <div class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
+  <!-- Scene area -->
+  <div class="scene-container">
+    <!-- Scene layers injected by player.js -->
+  </div>
+
+  <!-- Subtitles -->
+  <div class="subtitle-overlay"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn-prev" title="Previous scene">⏮</button>
+    <button class="btn-play" title="Play / Pause">▶</button>
+    <button class="btn-next" title="Next scene">⏭</button>
+    <span class="time-display">00:00 / 00:00</span>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 0%"></div>
+      <div class="progress-thumb" style="left: 0%"></div>
+    </div>
+    <span class="speed-badge" title="Playback speed">1x</span>
+    <button class="btn-fullscreen" title="Fullscreen">⛶</button>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   INLINE: player.js
+   ============================================ */
+
+class AnimationPlayer {
+  constructor(scenes) {
+    this.scenes = scenes;
+    this.currentIndex = -1;
+    this.playing = false;
+    this.speed = 1.0;
+    this.audioCtx = null;
+    this.currentAudio = null;
+    this.currentAudioSource = null;
+    this.currentAudioBuffer = null;
+    this.audioStartTime = 0;
+    this.audioElapsedBeforePause = 0;
+    this.sceneTimer = null;
+    this.rafId = null;
+    this.subtitleTimer = null;
+
+    this.totalDuration = scenes.reduce((sum, s) => sum + (s.duration || 5000), 0);
+
+    this.elements = {
+      player: document.querySelector('.player'),
+      sceneContainer: document.querySelector('.scene-container'),
+      subtitle: document.querySelector('.subtitle-overlay'),
+      playBtn: document.querySelector('.btn-play'),
+      prevBtn: document.querySelector('.btn-prev'),
+      nextBtn: document.querySelector('.btn-next'),
+      timeDisplay: document.querySelector('.time-display'),
+      speedBadge: document.querySelector('.speed-badge'),
+      fullscreenBtn: document.querySelector('.btn-fullscreen'),
+      progressBar: document.querySelector('.progress-bar'),
+      progressFill: document.querySelector('.progress-fill'),
+      progressThumb: document.querySelector('.progress-thumb'),
+      loadingOverlay: document.querySelector('.loading-overlay'),
+    };
+
+    this._init();
+  }
+
+  _init() {
+    this._createSceneLayers();
+    this._bindEvents();
+    this._bindKeyboard();
+    this._preloadAudio().then(() => {
+      this.elements.loadingOverlay.classList.add('hidden');
+      this._goToScene(0);
+    });
+  }
+
+  _createSceneLayers() {
+    this.scenes.forEach((scene, i) => {
+      const layer = document.createElement('div');
+      layer.className = 'scene-layer';
+      layer.dataset.sceneIndex = i;
+      layer.innerHTML = scene.content;
+      this.elements.sceneContainer.appendChild(layer);
+    });
+    this.layers = this.elements.sceneContainer.querySelectorAll('.scene-layer');
+  }
+
+  async _preloadAudio() {
+    try {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('Web Audio API not available, audio disabled');
+      return;
+    }
+
+    const loads = this.scenes.map(async (scene, i) => {
+      if (!scene.audio) return;
+      try {
+        const resp = await fetch(scene.audio);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const arrayBuffer = await resp.arrayBuffer();
+        const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
+        scene._audioBuffer = audioBuffer;
+        scene._durationFromAudio = audioBuffer.duration * 1000;
+        if (!scene.duration || scene.duration <= 0) {
+          scene.duration = scene._durationFromAudio;
+        }
+      } catch (e) {
+        console.warn('Failed to load audio for scene ' + i + ': ' + e.message);
+      }
+    });
+
+    await Promise.all(loads);
+    this.totalDuration = this.scenes.reduce((sum, s) => sum + (s.duration || 5000), 0);
+  }
+
+  _playAudioForScene(index) {
+    this._stopAudio();
+    if (!this.audioCtx) return;
+
+    const scene = this.scenes[index];
+    if (!scene || !scene._audioBuffer) return;
+
+    this.currentAudioBuffer = scene._audioBuffer;
+    this.currentAudioSource = this.audioCtx.createBufferSource();
+    this.currentAudioSource.buffer = this.currentAudioBuffer;
+    this.currentAudioSource.playbackRate.value = this.speed;
+    this.currentAudioSource.connect(this.audioCtx.destination);
+
+    this.currentAudioSource.onended = () => {
+      this.currentAudioSource = null;
+    };
+
+    this.currentAudioSource.start(0, this.audioElapsedBeforePause);
+    this.audioStartTime = this.audioCtx.currentTime - this.audioElapsedBeforePause;
+  }
+
+  _stopAudio() {
+    if (this.currentAudioSource) {
+      try { this.currentAudioSource.stop(); } catch (e) {}
+      this.currentAudioSource = null;
+    }
+    this.currentAudioBuffer = null;
+    this.audioElapsedBeforePause = 0;
+  }
+
+  _pauseAudio() {
+    if (this.currentAudioSource && this.audioCtx) {
+      this.audioElapsedBeforePause = this.audioCtx.currentTime - this.audioStartTime;
+      try { this.currentAudioSource.stop(); } catch (e) {}
+      this.currentAudioSource = null;
+    }
+  }
+
+  _getAudioElapsed() {
+    if (this.currentAudioSource && this.audioCtx) {
+      return this.audioCtx.currentTime - this.audioStartTime;
+    }
+    return this.audioElapsedBeforePause || 0;
+  }
+
+  _goToScene(index) {
+    if (index < 0 || index >= this.scenes.length) {
+      if (index >= this.scenes.length) { this._pause(); }
+      return;
+    }
+
+    this.currentIndex = index;
+
+    this.layers.forEach(l => l.classList.remove('active'));
+    const targetLayer = this.layers[index];
+    if (targetLayer) { targetLayer.classList.add('active'); }
+
+    this._stopAudio();
+    this._playAudioForScene(index);
+
+    this._clearSceneTimer();
+    this._startSubtitle(this.scenes[index]);
+
+    if (this.playing) {
+      const scene = this.scenes[index];
+      const effectiveDuration = scene.duration / this.speed;
+      this.sceneTimer = setTimeout(() => { this._nextScene(); }, effectiveDuration);
+    }
+  }
+
+  _nextScene() {
+    if (this.currentIndex < this.scenes.length - 1) {
+      this._goToScene(this.currentIndex + 1);
+    } else {
+      this._pause();
+    }
+  }
+
+  _prevScene() {
+    if (this.currentIndex > 0) {
+      this._goToScene(this.currentIndex - 1);
+    }
+  }
+
+  _clearSceneTimer() {
+    if (this.sceneTimer) { clearTimeout(this.sceneTimer); this.sceneTimer = null; }
+  }
+
+  _startSubtitle(scene) {
+    if (this.subtitleTimer) clearInterval(this.subtitleTimer);
+    this.elements.subtitle.textContent = scene.narration || '';
+  }
+
+  _clearSubtitle() {
+    if (this.subtitleTimer) { clearInterval(this.subtitleTimer); this.subtitleTimer = null; }
+    this.elements.subtitle.textContent = '';
+  }
+
+  _play() {
+    if (this.playing) return;
+    if (this.currentIndex < 0) this._goToScene(0);
+    this.playing = true;
+    this.elements.playBtn.textContent = '⏸';
+
+    if (this.currentAudioBuffer && !this.currentAudioSource) {
+      this._playAudioForScene(this.currentIndex);
+    }
+
+    const scene = this.scenes[this.currentIndex];
+    if (scene) {
+      const elapsed = this._getAudioElapsed();
+      const remaining = (scene.duration / this.speed) - (elapsed * 1000);
+      if (remaining > 0) {
+        this._clearSceneTimer();
+        this.sceneTimer = setTimeout(() => this._nextScene(), remaining);
+      }
+    }
+
+    this._startProgressLoop();
+    this._startSubtitle(this.scenes[this.currentIndex]);
+  }
+
+  _pause() {
+    if (!this.playing) return;
+    this.playing = false;
+    this.elements.playBtn.textContent = '▶';
+    this._clearSceneTimer();
+    this._pauseAudio();
+    this._stopProgressLoop();
+  }
+
+  _togglePlay() { this.playing ? this._pause() : this._play(); }
+
+  _cycleSpeed() {
+    const speeds = [0.5, 1.0, 1.5, 2.0];
+    const idx = speeds.indexOf(this.speed);
+    this.speed = speeds[(idx + 1) % speeds.length];
+    this.elements.speedBadge.textContent = this.speed + 'x';
+
+    if (this.currentAudioSource) {
+      this.currentAudioSource.playbackRate.value = this.speed;
+    }
+
+    if (this.playing) {
+      this._clearSceneTimer();
+      const scene = this.scenes[this.currentIndex];
+      if (scene) {
+        const elapsed = this._getAudioElapsed();
+        const remaining = (scene.duration / this.speed) - (elapsed * 1000);
+        if (remaining > 0) {
+          this.sceneTimer = setTimeout(() => this._nextScene(), remaining);
+        }
+      }
+    }
+  }
+
+  _getCurrentTime() {
+    let time = 0;
+    for (let i = 0; i < this.currentIndex; i++) {
+      time += this.scenes[i].duration;
+    }
+    const currentScene = this.scenes[this.currentIndex];
+    if (currentScene) {
+      const elapsed = this._getAudioElapsed();
+      time += Math.min(elapsed * 1000, currentScene.duration);
+    }
+    return time;
+  }
+
+  _startProgressLoop() {
+    this._stopProgressLoop();
+    const tick = () => {
+      if (!this.playing) return;
+      const current = this._getCurrentTime();
+      const pct = this.totalDuration > 0 ? (current / this.totalDuration) * 100 : 0;
+      this.elements.progressFill.style.width = Math.min(pct, 100) + '%';
+      this.elements.progressThumb.style.left = Math.min(pct, 100) + '%';
+      this._updateTimeDisplay(current);
+      this.rafId = requestAnimationFrame(tick);
+    };
+    this.rafId = requestAnimationFrame(tick);
+  }
+
+  _stopProgressLoop() {
+    if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
+  }
+
+  _updateTimeDisplay(ms) {
+    const format = (t) => {
+      const m = Math.floor(t / 60000);
+      const s = Math.floor((t % 60000) / 1000);
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    };
+    this.elements.timeDisplay.textContent = format(ms) + ' / ' + format(this.totalDuration);
+  }
+
+  _seekTo(e) {
+    const rect = this.elements.progressBar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    const targetMs = pct * this.totalDuration;
+
+    let accumulated = 0;
+    let targetIndex = 0;
+    for (let i = 0; i < this.scenes.length; i++) {
+      if (accumulated + this.scenes[i].duration >= targetMs) {
+        targetIndex = i;
+        break;
+      }
+      accumulated += this.scenes[i].duration;
+      targetIndex = i;
+    }
+
+    const offsetInScene = targetMs - accumulated;
+    this.audioElapsedBeforePause = offsetInScene / 1000;
+    this._goToScene(targetIndex);
+
+    if (this.playing) { this._playAudioForScene(targetIndex); }
+  }
+
+  _toggleFullscreen() {
+    const el = this.elements.player;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+    }
+  }
+
+  _bindEvents() {
+    this.elements.playBtn.addEventListener('click', () => this._togglePlay());
+    this.elements.prevBtn.addEventListener('click', () => this._prevScene());
+    this.elements.nextBtn.addEventListener('click', () => this._nextScene());
+    this.elements.speedBadge.addEventListener('click', () => this._cycleSpeed());
+    this.elements.fullscreenBtn.addEventListener('click', () => this._toggleFullscreen());
+    this.elements.progressBar.addEventListener('click', (e) => this._seekTo(e));
+
+    let dragging = false;
+    this.elements.progressBar.addEventListener('mousedown', (e) => { dragging = true; this._seekTo(e); });
+    document.addEventListener('mousemove', (e) => { if (dragging) this._seekTo(e); });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    this.elements.sceneContainer.addEventListener('click', (e) => {
+      if (e.target === this.elements.sceneContainer) { this._togglePlay(); }
+    });
+  }
+
+  _bindKeyboard() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.code) {
+        case 'Space': e.preventDefault(); this._togglePlay(); break;
+        case 'ArrowLeft': e.preventDefault(); this._prevScene(); break;
+        case 'ArrowRight': e.preventDefault(); this._nextScene(); break;
+        case 'KeyF':
+          if (!e.metaKey && !e.ctrlKey) { e.preventDefault(); this._toggleFullscreen(); }
+          break;
+      }
+    });
+  }
+
+  destroy() {
+    this._pause();
+    this._stopAudio();
+    this._clearSubtitle();
+    this._stopProgressLoop();
+    if (this.audioCtx) { this.audioCtx.close(); this.audioCtx = null; }
+  }
+}
+
+/* --- Bootstrap --- */
+// SCENES_DATA_PLACEHOLDER is replaced by the agent with the actual JSON scenes array
+window.SCENES_DATA = SCENES_DATA_PLACEHOLDER;
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.player = new AnimationPlayer(window.SCENES_DATA);
+});
+</script>
+
+</body>
+</html>

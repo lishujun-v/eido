@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>模型结构洞察</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M7 8.5 16 4l9 4.5v7L16 20l-9-4.5v-7Z"/><path d="m7 16.5 9 4.5 9-4.5v7L16 28l-9-4.5v-7Z"/><path d="M16 20v8M16 4v8m-9-3.5 9 4.5 9-4.5"/></svg>
+        </span>
+        <div>
+          <h1>模型结构洞察</h1>
+          <p>沿着一次前向传播，看清 Tensor 如何变化</p>
+        </div>
+      </div>
+      <div class="file-actions">
+        <span class="privacy-note"><i></i>本地解析，不上传模型</span>
+        <label class="open-button open-button-secondary" for="model-directory">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h9v13h-17v-11Z"/></svg>
+          选择模型目录
+        </label>
+        <label class="open-button" for="model-file">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0-12 4 4m-4-4L8 7M5 13v6h14v-6"/></svg>
+          选择模型文件
+        </label>
+        <input id="model-file" type="file" accept=".onnx,.json,.keras,.pt,.pth,.torchscript,.safetensors" />
+        <input id="model-directory" type="file" webkitdirectory directory multiple />
+      </div>
+    </header>
+
+    <section class="empty-view" id="empty-view">
+      <div class="empty-copy">
+        <h2>从文件看到模型如何思考</h2>
+          <p>输入一段文本，沿着 Token、Embedding、Attention、FFN 一路看到 Tensor 形状如何变化。也可以展开参数结构，追到具体权重。</p>
+        <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="拖放模型文件或目录，或选择模型文件">
+          <span class="drop-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v4h14v-4"/></svg>
+          </span>
+          <strong>拖放模型文件或目录到这里</strong>
+          <span>也可以选择文件或 Hugging Face 目录</span>
+          <div class="drop-actions">
+            <label for="model-file">选择文件</label>
+            <label for="model-directory">选择目录</label>
+          </div>
+          <small>支持 Safetensors（含分片）、ONNX、Keras、TorchScript</small>
+        </div>
+        <button class="sample-button" id="sample-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg>
+          先看一个 Transformer 示例
+        </button>
+      </div>
+      <div class="architecture-preview" aria-hidden="true">
+        <svg class="preview-lines" viewBox="0 0 580 410" preserveAspectRatio="none">
+          <path d="M79 201C143 201 144 104 211 104M79 201c64 0 65 98 132 98M289 104c62 0 62 97 128 97M289 299c62 0 62-98 128-98M495 201h63"/>
+        </svg>
+        <div class="preview-node input-node" style="--x:3%;--y:43%"><b>Input</b><span>tokens</span></div>
+        <div class="preview-node attention-node" style="--x:30%;--y:18%"><b>Attention</b><span>8 heads</span></div>
+        <div class="preview-node norm-node" style="--x:30%;--y:68%"><b>LayerNorm</b><span>768</span></div>
+        <div class="preview-node linear-node" style="--x:66%;--y:43%"><b>Linear</b><span>768 → 3072</span></div>
+        <div class="preview-node output-node" style="--x:84%;--y:43%"><b>Output</b><span>logits</span></div>
+        <span class="preview-caption">计算流预览</span>
+      </div>
+    </section>
+
+    <section class="workspace" id="workspace" hidden>
+      <aside class="model-sidebar" id="model-sidebar">
+        <div class="model-file-card">
+          <span class="file-glyph" id="file-glyph">ONNX</span>
+          <div class="file-copy"><strong id="file-name">model.onnx</strong><span id="file-meta">—</span></div>
+          <button class="icon-button" id="replace-file" type="button" aria-label="更换模型" title="更换模型">
+            <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.9 4M4 12A8 8 0 0 1 18.9 8M5 20v-4h4M19 4v4h-4"/></svg>
+          </button>
+        </div>
+
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <input id="node-search" type="search" placeholder="搜索层名称或类型" autocomplete="off" />
+          <kbd>⌘ K</kbd>
+        </div>
+
+        <nav class="category-list" id="category-list" aria-label="结构分类"></nav>
+
+        <div class="legend">
+          <strong>图例</strong>
+          <div id="legend-items"></div>
+        </div>
+      </aside>
+
+      <section class="graph-panel">
+        <div class="graph-toolbar">
+          <button class="mobile-panel-button" id="mobile-categories" type="button" aria-label="打开结构分类" aria-controls="model-sidebar" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="model-heading">
+            <h2 id="model-name">Model graph</h2>
+            <span id="graph-summary">—</span>
+          </div>
+          <div class="view-switch" role="tablist" aria-label="分析视图">
+            <button id="flow-tab" class="is-active" type="button" role="tab" aria-selected="true">Tensor 流</button>
+            <button id="structure-tab" type="button" role="tab" aria-selected="false">参数结构</button>
+          </div>
+          <div class="graph-controls" role="group" aria-label="画布控制">
+            <button id="zoom-out" type="button" aria-label="缩小"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+            <output id="zoom-value">100%</output>
+            <button id="zoom-in" type="button" aria-label="放大"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></button>
+            <button id="fit-graph" class="fit-button" type="button"><svg viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M9 20H4v-5m11 5h5v-5"/></svg>适应画布</button>
+          </div>
+          <button class="mobile-panel-button" id="mobile-inspector" type="button" aria-label="打开节点详情" aria-controls="inspector" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 11v5m0-8v.2"/></svg>
+          </button>
+        </div>
+        <div class="model-warning" id="model-warning" role="note" hidden></div>
+        <section class="trace-composer" id="trace-composer" aria-label="Tensor 流输入">
+          <div class="trace-input-wrap">
+            <label for="trace-input">输入文本</label>
+            <textarea id="trace-input" rows="2" spellcheck="false">今天天气很好，我们去公园散步。</textarea>
+          </div>
+          <button id="trace-run" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg>
+            推演 Tensor 流
+          </button>
+          <div class="trace-status"><strong id="trace-token-count">—</strong><span id="trace-mode">形状推演</span></div>
+        </section>
+        <section class="flow-viewport" id="flow-viewport" aria-label="Tensor 流程图">
+          <div class="flow-intro">
+            <div><strong>一次前向传播</strong><span>默认折叠重复层，点击节点查看输入、输出与层内计算</span></div>
+            <span class="trace-badge" id="trace-badge">基于配置推演</span>
+          </div>
+          <div class="token-strip" id="token-strip" aria-label="输入 token"></div>
+          <div class="flow-scroll">
+            <div class="flow-track" id="flow-track"></div>
+          </div>
+          <div class="flow-detail" id="flow-detail" hidden></div>
+        </section>
+        <div class="graph-viewport" id="graph-viewport">
+          <div class="graph-world" id="graph-world">
+            <svg class="graph-edges" id="graph-edges" aria-hidden="true"></svg>
+            <div class="graph-nodes" id="graph-nodes"></div>
+          </div>
+          <div class="graph-empty-search" id="graph-empty-search" hidden>没有匹配的结构节点</div>
+          <div class="canvas-hint"><span>滚轮缩放</span><span>拖动画布</span><span>点击节点查看详情</span></div>
+        </div>
+      </section>
+
+      <aside class="inspector" id="inspector">
+        <div class="inspector-empty" id="inspector-empty">
+          <span class="inspector-empty-icon"><svg viewBox="0 0 24 24"><path d="M12 3 4.5 7v10L12 21l7.5-4V7L12 3Z"/><path d="m4.5 7 7.5 4 7.5-4M12 11v10"/></svg></span>
+          <strong>选择一个结构节点</strong>
+          <p>查看这一步的输入输出形状、参数量与内部计算。</p>
+        </div>
+        <div class="inspector-content" id="inspector-content" hidden>
+          <div class="inspector-heading"><span class="node-symbol" id="detail-symbol"></span><div><span id="detail-category"></span><h3 id="detail-name"></h3></div></div>
+          <dl class="detail-stats">
+            <div><dt>算子类型</dt><dd id="detail-type">—</dd></div>
+            <div><dt>参数量</dt><dd id="detail-params">—</dd></div>
+            <div><dt>输出形状</dt><dd id="detail-shape">—</dd></div>
+          </dl>
+          <section class="detail-section"><h4>输入</h4><div class="tensor-list" id="detail-inputs"></div></section>
+          <section class="detail-section"><h4>输出</h4><div class="tensor-list" id="detail-outputs"></div></section>
+          <section class="detail-section" id="attribute-section"><h4>结构属性</h4><dl class="attribute-list" id="detail-attributes"></dl></section>
+        </div>
+      </aside>
+    </section>
+
+    <div class="loading-layer" id="loading-layer" role="status" aria-live="polite" aria-busy="true" hidden>
+      <span class="loader"></span><strong>正在读取模型结构</strong><p id="loading-detail">解析计算图与张量信息…</p>
+    </div>
+    <div class="toast" id="toast" role="alert" aria-live="assertive" hidden></div>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>

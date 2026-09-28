@@ -1,0 +1,14 @@
+{
+  "description": "D2 demo 输入示例。复制 examples/sample_paper.pdf 后跑:python3 scripts/main.py read_paper --pdf examples/sample_paper.pdf --out /tmp/out",
+  "expected_outputs": {
+    "paper_id": "p-<12-hex-of-pdf-path>",
+    "summary": "200-500 字全文摘要",
+    "chapters": ["Abstract", "1 Introduction", "2 Methodology", "3 Experiments", "4 Conclusion"],
+    "key_sentences": ["3-8 条关键句,标注页码"],
+    "contributions": ["3-5 条贡献,每条一句话"],
+    "methodology": "方法论详述(模型/算法/流程)",
+    "experiments": "实验设置与结果",
+    "page_refs": {"summary": "p.X", "methodology": "p.X-Y"}
+  },
+  "note": "用户使用时,先把任意 arxiv 论文 PDF 放到 examples/sample_paper.pdf,然后跑上述命令。Mock 模式下也能跑通(无 API key 也行)。"
+}

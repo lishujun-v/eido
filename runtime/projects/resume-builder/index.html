@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历制作工具</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="template-styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand-block">
+    <h1>简历制作工具</h1>
+    <span id="saveStatus" class="save-status">准备就绪</span>
+  </div>
+  <div class="header-actions">
+    <div class="template-selector">
+      <label for="tplSelect">模板</label>
+      <select id="tplSelect" onchange="activateTemplate(this.value)"></select>
+    </div>
+    <button type="button" class="ghost-btn mobile-only" onclick="toggleMobilePreview()">预览</button>
+    <button type="button" class="ghost-btn smart-import-btn" onclick="openSmartImport()">智能导入</button>
+    <button type="button" class="ghost-btn" onclick="loadSampleData()">载入示例</button>
+    <button type="button" class="ghost-btn" onclick="clearResume()">清空</button>
+    <button type="button" class="ghost-btn" onclick="printResume()">打印</button>
+    <button id="exportBtn" type="button" onclick="exportPDF()">导出 PDF</button>
+  </div>
+</header>
+
+<input
+  type="file"
+  id="smartImportFile"
+  accept=".pdf,.doc,.docx,.md,.markdown,.txt,.rtf,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
+  onchange="handleSmartImportFile(event)"
+  hidden
+>
+
+<div id="smartImportModal" class="modal-backdrop" hidden>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="smartImportTitle">
+    <div class="modal-header">
+      <h2 id="smartImportTitle">智能导入</h2>
+      <button type="button" class="modal-close" onclick="closeSmartImportModal()" aria-label="关闭">&times;</button>
+    </div>
+    <p id="smartImportStatus" class="modal-status">选择 PDF、DOCX、MD 或 TXT 文件后，将自动提取内容并调用 AI 解析。</p>
+    <div class="modal-form">
+      <label>
+        AI 接口地址
+        <input type="url" id="aiEndpoint" placeholder="/api/parse-resume 或 .../chat/completions">
+      </label>
+      <label>
+        API Key
+        <input type="password" id="aiApiKey" placeholder="可选，建议使用服务端代理">
+      </label>
+      <label>
+        模型
+        <input type="text" id="aiModel" placeholder="使用 chat/completions 时填写">
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="ghost-action" onclick="saveSmartImportSettings()">保存设置</button>
+      <button type="button" class="primary-action" onclick="retrySmartImport()">重新解析</button>
+    </div>
+  </div>
+</div>
+
+<div class="main-layout" id="mainLayout">
+  <!-- Left: Editor -->
+  <div class="editor-panel">
+    <div class="editor-scroll">
+
+      <!-- Personal Info -->
+      <section class="form-section">
+        <h2>基本信息</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>姓名</label>
+            <input type="text" id="name" oninput="handleInput()" placeholder="张三">
+          </div>
+          <div class="form-group">
+            <label>职位</label>
+            <input type="text" id="title" oninput="handleInput()" placeholder="高级前端工程师">
+          </div>
+          <div class="form-group">
+            <label>电话</label>
+            <input type="tel" id="phone" oninput="handleInput()" placeholder="138-0000-0000">
+          </div>
+          <div class="form-group">
+            <label>邮箱</label>
+            <input type="email" id="email" oninput="handleInput()" placeholder="example@email.com">
+          </div>
+          <div class="form-group">
+            <label>个人网站</label>
+            <input type="url" id="website" oninput="handleInput()" placeholder="https://github.com/xxx">
+          </div>
+          <div class="form-group">
+            <label>期望城市</label>
+            <input type="text" id="expectedCity" oninput="handleInput()" placeholder="上海 / 北京 / 杭州">
+          </div>
+          <div class="form-group">
+            <label>预期薪资</label>
+            <input type="text" id="expectedSalary" oninput="handleInput()" placeholder="35k-50k / 面议">
+          </div>
+          <div class="form-group">
+            <label>到岗时间</label>
+            <input type="text" id="availability" oninput="handleInput()" placeholder="两周内 / 一个月内">
+          </div>
+          <div class="form-group">
+            <label>求职状态</label>
+            <input type="text" id="jobStatus" oninput="handleInput()" placeholder="在职看机会 / 离职可快速到岗">
+          </div>
+          <div class="form-group full-width">
+            <label>项目展示</label>
+            <input type="url" id="projectShowcase" oninput="handleInput()" placeholder="GitHub / Demo / Hugging Face / 项目主页">
+          </div>
+          <div class="form-group full-width">
+            <label>个人简介</label>
+            <textarea id="summary" rows="3" oninput="handleInput()" placeholder="简短介绍一下自己..."></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>照片</label>
+            <input type="file" id="photo" accept="image/*" onchange="handlePhoto(event)">
+          </div>
+        </div>
+      </section>
+
+      <!-- Education -->
+      <section class="form-section">
+        <h2>教育经历</h2>
+        <div id="educationList"></div>
+        <button class="add-btn" onclick="addEducation()">+ 添加教育经历</button>
+      </section>
+
+      <!-- Work Experience -->
+      <section class="form-section">
+        <h2>工作经历</h2>
+        <div id="workList"></div>
+        <button class="add-btn" onclick="addWork()">+ 添加工作经历</button>
+      </section>
+
+      <!-- Skills -->
+      <section class="form-section">
+        <h2>技能</h2>
+        <div id="skillList"></div>
+        <button class="add-btn" onclick="addSkill()">+ 添加技能</button>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Right: Preview -->
+  <div class="preview-panel">
+    <div class="preview-label">实时预览</div>
+    <div class="preview-scroll">
+      <div id="resumePreview" class="resume-page">
+        <div class="resume-header-section">
+          <img id="prevPhoto" class="resume-photo" style="display:none" alt="照片">
+          <h1 id="prevName"></h1>
+          <div id="prevTitle" class="resume-title"></div>
+          <div id="prevContact" class="resume-contact"></div>
+        </div>
+        <div id="prevSummary" class="resume-section"></div>
+        <div id="prevEducation" class="resume-section"></div>
+        <div id="prevWork" class="resume-section"></div>
+        <div id="prevProject" class="resume-section"></div>
+        <div id="prevSkill" class="resume-section"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="templates/registry.js"></script>
+<script src="templates/classic.js"></script>
+<script src="templates/default.js"></script>
+<script src="templates/modern.js"></script>
+<script src="templates/llm.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

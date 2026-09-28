@@ -1,0 +1,192 @@
+# paper-companion 接口契约
+# 校验 schema: ~/Workspace/Agent/schemas/skill_interface.schema.json
+# preflight schema: ~/Workspace/Agent/schemas/action_preflight.schema.json
+
+skill_id: paper-companion
+version: 0.1.0
+description: 论文 → 多层级摘要 → 知识图谱 → 学习路径 → 间隔重复 → Anki 卡片的端到端伴学 skill
+
+actions:
+  # read_paper: 解析 PDF/URL,生成多层级摘要
+  # reversibility=high(只读),policy=off(只读免跑 preflight)
+  - name: read_paper
+    description: 解析 PDF 或 URL,生成多层级摘要(全文/章节/关键句)+ 关键贡献 + 方法论 + 实验结果
+    inputs:
+      type: object
+      properties:
+        pdf_path:
+          type: string
+          description: 本地 PDF 文件路径,与 url 互斥
+        url:
+          type: string
+          description: arxiv / 网页 URL,与 pdf_path 互斥
+        max_pages:
+          type: integer
+          description: 最大解析页数(防止超长文档)
+          default: 30
+      required: []
+    outputs:
+      type: object
+      properties:
+        paper_id:
+          type: string
+        summary:
+          type: string
+          description: 全文摘要(200-500 字)
+        chapters:
+          type: array
+          description: 章节级摘要
+        key_sentences:
+          type: array
+          description: 关键句列表
+        contributions:
+          type: array
+        methodology:
+          type: string
+        experiments:
+          type: string
+        page_refs:
+          type: object
+          description: 关键内容对应的页码引用
+    reversibility: high
+    preflight:
+      policy: "off"
+      default_context:
+        contains_sensitive_data: false
+        external_visibility: none
+        reversibility: high
+
+  # build_graph: 从摘要抽实体关系图
+  # reversibility=high(只计算),policy=off
+  - name: build_graph
+    description: 从论文摘要抽取概念/方法/引文/作者的实体关系图
+    inputs:
+      type: object
+      properties:
+        summary:
+          type: object
+          description: read_paper 输出的 summary dict
+      required: [summary]
+    outputs:
+      type: object
+      properties:
+        nodes:
+          type: array
+          description: 实体节点(概念/方法/作者/引文)
+        edges:
+          type: array
+          description: 关系边(used_by/cites/extends/...)
+        centrality:
+          type: object
+          description: 节点中心度(识别核心概念)
+    reversibility: high
+    preflight:
+      policy: "off"
+      default_context:
+        contains_sensitive_data: false
+        external_visibility: none
+        reversibility: high
+
+  # make_plan: 生成学习路径
+  # reversibility=low(写文件),policy=required
+  - name: make_plan
+    description: 输入学习目标 + 论文列表,生成周/天粒度学习路径 + 推荐资源
+    inputs:
+      type: object
+      properties:
+        goal:
+          type: string
+          description: 学习目标,如 "掌握 Transformer 注意力机制"
+        papers:
+          type: array
+          description: 已读论文的 read_paper 结果列表
+        weeks:
+          type: integer
+          description: 计划总周数
+          default: 4
+        hours_per_day:
+          type: number
+          description: 每天学习时长(小时)
+          default: 1.5
+      required: [goal]
+    outputs:
+      type: object
+      properties:
+        phases:
+          type: array
+        daily_tasks:
+          type: array
+        resources:
+          type: array
+    reversibility: low
+    preflight:
+      policy: required
+      default_context:
+        contains_sensitive_data: false
+        external_visibility: none
+        reversibility: low
+
+  # schedule_review: 间隔重复排序
+  # reversibility=low(写状态),policy=required
+  - name: schedule_review
+    description: 输入知识卡片,按 SM-2 算法排序复习顺序
+    inputs:
+      type: object
+      properties:
+        cards:
+          type: array
+          description: 知识卡片列表
+        now:
+          type: string
+          description: 当前时间(ISO 格式),默认 now
+      required: [cards]
+    outputs:
+      type: object
+      properties:
+        review_queue:
+          type: array
+        stats:
+          type: object
+    reversibility: low
+    preflight:
+      policy: required
+      default_context:
+        contains_sensitive_data: false
+        external_visibility: none
+        reversibility: low
+
+  # export_anki: 生成 .apkg
+  # reversibility=low(写文件),policy=required
+  - name: export_anki
+    description: 把知识卡片导出为 Anki .apkg 文件
+    inputs:
+      type: object
+      properties:
+        deck_name:
+          type: string
+        cards:
+          type: array
+        out_path:
+          type: string
+      required: [deck_name, cards, out_path]
+    outputs:
+      type: object
+      properties:
+        apkg_path:
+          type: string
+        card_count:
+          type: integer
+    reversibility: low
+    preflight:
+      policy: required
+      default_context:
+        contains_sensitive_data: false
+        external_visibility: none
+        reversibility: low
+
+dependencies:
+  - pymupdf
+  - requests
+  - pyyaml
+  - jsonschema
+  - genanki

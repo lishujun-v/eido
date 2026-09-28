@@ -1,0 +1,85 @@
+<h2>你想支持哪些动画类型？</h2>
+<p class="subtitle">选择你需要的动画类型（可多选）</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="particles" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>粒子特效</h3>
+      <p>粒子爆炸、烟花、下雪、星空、粒子跟随鼠标等</p>
+    </div>
+  </div>
+  <div class="option" data-choice="css-animation" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>CSS 关键帧动画</h3>
+      <p>弹跳、旋转、淡入淡出、滑动、缩放、变色等过渡动画</p>
+    </div>
+  </div>
+  <div class="option" data-choice="canvas" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Canvas 绘制动画</h3>
+      <p>波形图、分形、流体模拟、万花筒、动态图表等</p>
+    </div>
+  </div>
+  <div class="option" data-choice="svg" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>SVG 路径动画</h3>
+      <p>描边动画、路径变形、图标动效、logo 动画等</p>
+    </div>
+  </div>
+  <div class="option" data-choice="3d" onclick="toggleSelect(this)">
+    <div class="letter">E</div>
+    <div class="content">
+      <h3>3D / WebGL 动画</h3>
+      <p>Three.js 3D 场景、旋转模型、光影效果等</p>
+    </div>
+  </div>
+  <div class="option" data-choice="text" onclick="toggleSelect(this)">
+    <div class="letter">F</div>
+    <div class="content">
+      <h3>文字动画</h3>
+      <p>打字机效果、文字飞入、逐字高亮、标题大屏动效等</p>
+    </div>
+  </div>
+  <div class="option" data-choice="physics" onclick="toggleSelect(this)">
+    <div class="letter">G</div>
+    <div class="content">
+      <h3>物理模拟</h3>
+      <p>重力、碰撞、弹簧、布料、流体等物理效果</p>
+    </div>
+  </div>
+  <div class="option" data-choice="all" onclick="toggleSelect(this)">
+    <div class="letter">H</div>
+    <div class="content">
+      <h3>全部都要</h3>
+      <p>不限制类型，Agent 根据描述自行判断最合适的实现方式</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px;">
+  <h3>示例：粒子效果</h3>
+  <div class="mockup">
+    <div class="mockup-header">用户说"做一个烟花动画"</div>
+    <div class="mockup-body" style="padding: 24px; background: #1a1a2e; border-radius: 8px; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+      <div style="text-align: center; color: #fff;">
+        <div style="font-size: 14px; opacity: 0.6; margin-bottom: 12px;">Agent 生成一个独立的 HTML 文件</div>
+        <div style="font-size: 13px; color: #7ecb76; font-family: monospace; background: rgba(255,255,255,0.05); padding: 12px 20px; border-radius: 6px; display: inline-block; text-align: left;">
+          &lt;!DOCTYPE html&gt;<br>
+          &lt;html&gt;<br>
+          &nbsp;&nbsp;&lt;canvas id="c"&gt;&lt;/canvas&gt;<br>
+          &nbsp;&nbsp;&lt;script&gt;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;// 烟花粒子系统<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;const particles = [];<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;// ... 爆炸逻辑<br>
+          &nbsp;&nbsp;&lt;/script&gt;<br>
+          &lt;/html&gt;
+        </div>
+        <div style="font-size: 12px; opacity: 0.4; margin-top: 12px;">→ 浏览器打开即看，无需任何依赖</div>
+      </div>
+    </div>
+  </div>
+</div>

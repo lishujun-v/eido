@@ -1,0 +1,10 @@
+{
+  "name": "专注看板",
+  "description": "以日期为中心的专注任务总表，支持每日进展、跨日继承与历史快照。",
+  "version": "2.0.0",
+  "entry": "index.html",
+  "icon": "✓",
+  "accent": "#6558d9",
+  "tags": ["效率", "任务管理", "每日进展"],
+  "permissions": ["project.storage"]
+}

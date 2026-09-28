@@ -1,0 +1,166 @@
+{
+  "nodes": [
+    {
+      "ref": "it-overview",
+      "title": "IT技术体系概览",
+      "type": "概念",
+      "summary": "IT技术体系的核心组成与分类",
+      "content": "IT技术体系主要包含以下几个核心领域:\n\n1. **编程语言**: 软件开发的基础工具,包括Python、Java、JavaScript、Go、Rust、C++等\n2. **前端开发**: 用户界面与交互,核心技术为HTML/CSS/JavaScript,主流框架有React、Vue、Angular\n3. **后端开发**: 业务逻辑与数据处理,常用框架有Spring Boot、Django、Express等\n4. **数据库**: 数据存储与管理,分为关系型(MySQL、PostgreSQL)和非关系型(Redis、MongoDB)\n5. **云计算**: 按需使用计算资源,服务模式包括IaaS、PaaS、SaaS\n6. **微服务架构**: 将大型应用拆分为小型独立服务,提升可扩展性和可维护性\n7. **DevOps**: 开发与运维一体化,强调持续集成、持续交付和自动化\n8. **容器化**: 应用打包与部署技术,核心工具为Docker和Kubernetes\n9. **网络与安全**: 网络协议、网络安全、数据加密等基础知识",
+      "tags": ["IT", "技术体系", "概览"],
+      "aliases": ["IT知识体系", "信息技术概览"]
+    },
+    {
+      "ref": "python",
+      "title": "Python编程语言",
+      "type": "编程语言",
+      "summary": "最流行的编程语言之一,广泛应用于AI、数据分析、Web开发等领域",
+      "content": "## 语言特点\n- 语法简洁,接近自然语言,入门门槛低\n- 解释型、动态类型、面向对象\n- 拥有庞大的标准库和第三方库生态\n\n## 主要应用领域\n1. **数据科学与AI**: NumPy、Pandas、Scikit-learn、PyTorch、TensorFlow\n2. **Web开发**: Django、Flask、FastAPI框架\n3. **自动化脚本**: 运维自动化、测试自动化\n4. **网络爬虫**: BeautifulSoup、Scrapy\n5. **科学计算**: SciPy、Matplotlib\n\n## 核心概念\n- 数据类型: 列表、元组、字典、集合\n- 控制流: if/elif/else、for、while\n- 函数与模块: def定义函数、import导入模块\n- 面向对象: 类(class)、继承、封装、多态\n- 异常处理: try/except/finally\n\n## 2025年趋势\n- 在AI/ML领域持续占据主导地位(使用率约48%)\n- 数据科学和机器学习领域的首选语言\n- 人才需求旺盛,平均薪资较高",
+      "tags": ["Python", "编程语言", "AI", "数据分析"],
+      "aliases": ["python", "蟒蛇语言"]
+    },
+    {
+      "ref": "java",
+      "title": "Java编程语言",
+      "type": "编程语言",
+      "summary": "企业级应用开发的主力语言,跨平台特性突出",
+      "content": "## 语言特点\n- 面向对象、跨平台(JVM)\n- 强类型、静态类型检查\n- 丰富的生态系统和社区支持\n\n## 核心技术栈\n1. **Java SE**: 核心语法、集合框架、并发编程、IO/NIO\n2. **Java EE/Spring**: Spring Boot、Spring Cloud、Spring MVC\n3. **构建工具**: Maven、Gradle\n4. **ORM框架**: MyBatis、Hibernate\n5. **JVM调优**: 垃圾回收、内存管理、性能优化\n\n## 主要应用场景\n- 企业级后端系统(银行、电商、ERP)\n- Android应用开发\n- 大数据处理(Hadoop、Spark)\n- 微服务架构(Spring Cloud)\n\n## 2025年学习路线\n1. 基础阶段: 核心语法、OOP、集合、IO\n2. 进阶阶段: JVM原理、并发编程、设计模式\n3. 数据库: MySQL、SQL优化、事务\n4. 框架: Spring生态、MyBatis\n5. 微服务: Spring Cloud、Dubbo、gRPC\n\n## 新特性\n- Java 17/21 LTS版本\n- 虚拟线程(Java 21)\n- GraalVM原生镜像支持",
+      "tags": ["Java", "编程语言", "企业级", "Spring"],
+      "aliases": ["java", "爪哇语言"]
+    },
+    {
+      "ref": "javascript",
+      "title": "JavaScript与TypeScript",
+      "type": "编程语言",
+      "summary": "Web开发的核心语言,前端必备,通过Node.js也可用于后端开发",
+      "content": "## JavaScript特点\n- 动态类型、解释型、基于原型的面向对象\n- 浏览器端原生支持\n- 事件驱动、异步编程(回调、Promise、async/await)\n\n## TypeScript特点\n- JavaScript的超集,添加了静态类型系统\n- 编译时类型检查,减少运行时错误\n- 更好的IDE支持和代码提示\n- 2025年使用率约30%,大型前端项目标准选择\n\n## 前端框架\n1. **React**: Facebook开发,组件化、虚拟DOM、Hooks\n2. **Vue**: 渐进式框架,易上手,双向数据绑定\n3. **Angular**: Google开发,完整的企业级框架\n\n## 后端开发(Node.js)\n- Express: 轻量级Web框架\n- NestJS: 企业级Node.js框架\n- Koa: Express原班人马开发\n\n## 核心概念\n- DOM操作与事件处理\n- 闭包、原型链、作用域\n- ES6+新特性: 箭头函数、解构、模块、Promise\n- 异步编程: 回调、Promise、async/await",
+      "tags": ["JavaScript", "TypeScript", "前端", "Web开发"],
+      "aliases": ["JS", "TS", "前端开发"]
+    },
+    {
+      "ref": "go-rust",
+      "title": "Go与Rust语言",
+      "type": "编程语言",
+      "summary": "新兴高性能编程语言,分别在高并发和系统编程领域表现突出",
+      "content": "## Go语言\n### 特点\n- 静态类型、编译型、内置并发支持\n- 语法简洁,编译速度快\n- 垃圾回收,无需手动管理内存\n\n### 核心特性\n- Goroutine: 轻量级协程,简化并发编程\n- Channel: 协程间通信机制\n- 标准库强大,内置HTTP服务器\n\n### 应用场景\n- 云计算与微服务(Docker、Kubernetes用Go开发)\n- 高并发后端服务\n- 网络编程\n- 2025年使用率约32%\n\n## Rust语言\n### 特点\n- 静态类型、编译型、无垃圾回收\n- 内存安全(所有权机制)\n- 零成本抽象,性能接近C/C++\n\n### 核心特性\n- 所有权(Ownership): 编译时内存安全保证\n- 借用(Borrowing): 避免数据竞争\n- 生命周期(Lifetime): 引用有效性管理\n\n### 应用场景\n- 系统编程(操作系统、嵌入式)\n- WebAssembly\n- 安全关键应用\n- 2025年使用率约22%\n\n## 对比\n| 特性 | Go | Rust |\n|------|-----|------|\n| 内存管理 | 垃圾回收 | 所有权机制 |\n| 学习曲线 | 平缓 | 陡峭 |\n| 并发模型 | Goroutine | async/await |\n| 适用场景 | 云原生、微服务 | 系统编程、安全关键 |",
+      "tags": ["Go", "Rust", "编程语言", "高性能"],
+      "aliases": ["Golang", "Rust语言"]
+    },
+    {
+      "ref": "database-overview",
+      "title": "数据库技术",
+      "type": "技术",
+      "summary": "数据存储与管理的核心技术,分为关系型和非关系型两大类",
+      "content": "## 关系型数据库(RDBMS)\n### MySQL\n- 最流行的开源关系型数据库\n- 支持事务、索引、存储过程\n- 适用场景: Web应用、电商系统、企业应用\n- 核心: InnoDB引擎、B+树索引、事务隔离级别\n\n### PostgreSQL\n- 功能强大的开源对象关系型数据库\n- 支持JSON、地理空间数据(PostGIS)\n- 扩展性强,支持自定义类型和函数\n\n### SQL核心\n- DDL: CREATE、ALTER、DROP\n- DML: SELECT、INSERT、UPDATE、DELETE\n- 事务: ACID特性(原子性、一致性、隔离性、持久性)\n- 索引: B+树、哈希索引、全文索引\n\n## 非关系型数据库(NoSQL)\n### Redis\n- 内存键值数据库\n- 支持字符串、哈希、列表、集合、有序集合\n- 适用场景: 缓存、会话管理、消息队列\n- 特点: 高性能、支持持久化\n\n### MongoDB\n- 文档型数据库,存储JSON格式数据\n- 灵活的Schema设计\n- 适用场景: 内容管理、日志存储、大数据分析\n\n## 数据库设计原则\n- 范式理论: 1NF、2NF、3NF、BCNF\n- 反范式化: 适当冗余提升查询性能\n- 分库分表: 水平拆分、垂直拆分\n- 读写分离: 主从复制",
+      "tags": ["数据库", "MySQL", "Redis", "MongoDB", "SQL"],
+      "aliases": ["数据库", "DB"]
+    },
+    {
+      "ref": "frontend-dev",
+      "title": "前端开发技术",
+      "type": "技术",
+      "summary": "构建用户界面的技术体系,包括HTML/CSS/JavaScript及现代框架",
+      "content": "## 基础技术\n### HTML5\n- 语义化标签: header、nav、article、section\n- 表单增强: date、email、range等输入类型\n- 多媒体: audio、video、canvas\n\n### CSS3\n- 布局: Flexbox、Grid\n- 动画: transition、animation、transform\n- 响应式设计: 媒体查询、移动端适配\n- 预处理器: Sass、Less\n\n### JavaScript(ES6+)\n- 变量: let、const\n- 函数: 箭头函数、默认参数、rest参数\n- 模块化: import/export\n- 异步: Promise、async/await\n- 新特性: 解构赋值、扩展运算符、可选链\n\n## 现代前端框架\n### React\n- 组件化开发\n- 虚拟DOM提升性能\n- Hooks: useState、useEffect、useContext\n- 生态: React Router、Redux/Zustand\n\n### Vue\n- 渐进式框架\n- 响应式数据绑定\n- 组合式API(Composition API)\n- 生态: Vue Router、Pinia\n\n## 工程化工具\n- 构建工具: Vite、Webpack\n- 包管理: npm、yarn、pnpm\n- 代码规范: ESLint、Prettier\n- 版本控制: Git",
+      "tags": ["前端", "HTML", "CSS", "React", "Vue"],
+      "aliases": ["前端开发", "Web前端"]
+    },
+    {
+      "ref": "backend-dev",
+      "title": "后端开发技术",
+      "type": "技术",
+      "summary": "处理业务逻辑、数据存储和API服务的技术体系",
+      "content": "## 核心职责\n- 业务逻辑实现\n- 数据存储与管理\n- API设计与实现\n- 用户认证与授权\n- 性能优化与安全防护\n\n## 主流技术栈\n### Java生态\n- Spring Boot: 快速构建企业级应用\n- Spring Cloud: 微服务全家桶\n- MyBatis: ORM框架\n- Maven/Gradle: 构建工具\n\n### Python生态\n- Django: 全功能Web框架\n- Flask: 轻量级微框架\n- FastAPI: 高性能异步框架\n\n### Node.js生态\n- Express: 轻量Web框架\n- NestJS: 企业级框架\n- Koa: 下一代Web框架\n\n### Go生态\n- Gin: 高性能HTTP框架\n- Beego: 全功能Web框架\n\n## API设计\n### RESTful API\n- 资源导向: URL表示资源,HTTP方法表示操作\n- 状态码: 200成功、201创建、400错误、404未找到、500服务器错误\n- 无状态: 每次请求包含所有必要信息\n\n### GraphQL\n- 客户端按需查询\n- 强类型Schema\n- 单次请求获取多个资源\n\n## 核心技术\n- 缓存: Redis、Memcached\n- 消息队列: RabbitMQ、Kafka\n- 搜索引擎: Elasticsearch\n- 认证授权: JWT、OAuth2.0",
+      "tags": ["后端", "API", "Spring", "Django"],
+      "aliases": ["后端开发", "服务端开发"]
+    },
+    {
+      "ref": "cloud-computing",
+      "title": "云计算技术",
+      "type": "技术",
+      "summary": "按需使用计算资源的模式,包括IaaS、PaaS、SaaS三种服务模式",
+      "content": "## 云计算服务模式\n### IaaS(基础设施即服务)\n- 提供计算、存储、网络等基础资源\n- 用户可部署任意操作系统和应用\n- 代表: AWS EC2、阿里云ECS、腾讯云CVM\n- 适用: 需要完全控制基础设施的场景\n\n### PaaS(平台即服务)\n- 提供应用开发和部署平台\n- 用户无需管理底层基础设施\n- 代表: Google App Engine、Heroku、阿里云函数计算\n- 适用: 快速开发和部署应用\n\n### SaaS(软件即服务)\n- 直接提供可用的应用软件\n- 用户通过浏览器或API使用\n- 代表: Office 365、Salesforce、钉钉\n- 适用: 直接使用软件服务,无需开发\n\n## 云原生技术\n### 容器化\n- Docker: 应用容器化打包\n- Kubernetes(K8s): 容器编排平台\n- 特点: 环境一致性、快速部署、资源隔离\n\n### 微服务\n- 将应用拆分为独立的小型服务\n- 每个服务独立部署和扩展\n- 通过API进行通信\n\n### DevOps\n- 开发与运维一体化\n- 持续集成/持续交付(CI/CD)\n- 自动化测试和部署\n\n### Serverless\n- 无服务器计算\n- 按实际执行次数和资源使用计费\n- 代表: AWS Lambda、阿里云函数计算\n\n## 主要云服务商\n- AWS(Amazon Web Services)\n- Microsoft Azure\n- Google Cloud Platform\n- 阿里云、腾讯云、华为云",
+      "tags": ["云计算", "IaaS", "PaaS", "SaaS", "云原生"],
+      "aliases": ["云计算", "Cloud Computing"]
+    },
+    {
+      "ref": "microservices",
+      "title": "微服务架构",
+      "type": "架构",
+      "summary": "将大型应用拆分为小型独立服务的架构模式,提升可扩展性和可维护性",
+      "content": "## 核心概念\n### 服务拆分\n- 按业务功能拆分为独立服务\n- 每个服务单一职责\n- 服务间松耦合\n\n### 独立部署\n- 每个服务可独立开发、测试、部署\n- 不同服务可使用不同技术栈\n- 故障隔离,单个服务故障不影响整体\n\n### 轻量级通信\n- RESTful API(HTTP/JSON)\n- gRPC(HTTP/2/Protobuf,高性能)\n- 消息队列(异步通信)\n\n## 核心组件\n### 服务注册与发现\n- Nacos、Consul、Eureka\n- 服务实例动态注册和发现\n- 负载均衡\n\n### API网关\n- 统一入口,路由转发\n- 认证授权、限流熔断\n- 代表: Kong、Spring Cloud Gateway\n\n### 配置中心\n- 集中管理配置\n- 动态更新配置\n- 代表: Nacos、Apollo\n\n### 服务网格(Service Mesh)\n- 处理服务间通信\n- 流量管理、安全策略、可观测性\n- 代表: Istio、Linkerd\n\n## 设计原则\n- 单一职责: 每个服务只负责一项业务功能\n- 去中心化: 避免单点故障\n- 容错设计: 熔断、降级、重试\n- 数据一致性: 最终一致性、分布式事务\n\n## 挑战\n- 分布式系统复杂性\n- 服务间通信开销\n- 数据一致性保证\n- 运维复杂度提升\n\n## 常用框架\n- Spring Cloud Alibaba(Nacos、Sentinel)\n- Dubbo(高性能RPC)\n- gRPC(跨语言通信)",
+      "tags": ["微服务", "架构", "分布式", "Spring Cloud"],
+      "aliases": ["微服务架构", "Microservices"]
+    },
+    {
+      "ref": "devops",
+      "title": "DevOps实践",
+      "type": "方法论",
+      "summary": "开发与运维一体化方法论,强调自动化、持续集成和持续交付",
+      "content": "## 核心理念\n- 打破开发与运维的壁垒\n- 强调协作与沟通\n- 自动化一切可自动化的流程\n- 快速迭代、持续改进\n\n## CALMS模型\n- **C**ulture(文化): 协作、信任、持续学习\n- **A**utomation(自动化): 构建、测试、部署自动化\n- **L**ean(精益): 小批量、快速反馈\n- **M**easurement(度量): 数据驱动的决策\n- **S**haring(分享): 知识与经验共享\n\n## 持续集成(CI)\n- 代码频繁提交到主干\n- 自动构建和测试\n- 尽早发现问题\n- 工具: Jenkins、GitLab CI、GitHub Actions\n\n## 持续交付(CD)\n- 代码随时可部署到生产环境\n- 自动化部署流程\n- 降低发布风险\n- 工具: ArgoCD、Spinnaker\n\n## 基础设施即代码(IaC)\n- 用代码定义和管理基础设施\n- 版本控制、可重复部署\n- 工具: Terraform、Ansible、CloudFormation\n\n## 监控与日志\n- 应用监控: Prometheus、Grafana\n- 日志管理: ELK Stack(Elasticsearch、Logstash、Kibana)\n- 链路追踪: Jaeger、Zipkin\n\n## GitOps\n- 以Git为单一事实来源\n- 通过Git管理基础设施和应用配置\n- 自动化同步Git仓库与集群状态\n\n## 核心价值\n- 缩短交付周期\n- 提高部署频率\n- 降低失败率\n- 加快恢复时间",
+      "tags": ["DevOps", "CI/CD", "自动化", "运维"],
+      "aliases": ["DevOps", "DevOps实践"]
+    },
+    {
+      "ref": "docker-k8s",
+      "title": "容器化技术",
+      "type": "技术",
+      "summary": "应用容器化打包与编排技术,核心工具为Docker和Kubernetes",
+      "content": "## Docker\n### 核心概念\n- **镜像(Image)**: 应用及其依赖的只读模板\n- **容器(Container)**: 镜像的运行实例\n- **仓库(Registry)**: 存储和分发镜像,如Docker Hub\n\n### 基本操作\n```bash\n# 构建镜像\ndocker build -t myapp:1.0 .\n\n# 运行容器\ndocker run -d -p 8080:80 myapp:1.0\n\n# 查看运行容器\ndocker ps\n\n# 进入容器\ndocker exec -it container_id /bin/bash\n```\n\n### Dockerfile\n- FROM: 基础镜像\n- RUN: 构建时执行命令\n- COPY/ADD: 复制文件\n- EXPOSE: 暴露端口\n- CMD/ENTRYPOINT: 容器启动命令\n\n## Kubernetes(K8s)\n### 核心组件\n- **Pod**: 最小部署单元,包含一个或多个容器\n- **Service**: 服务发现和负载均衡\n- **Deployment**: 无状态应用部署\n- **StatefulSet**: 有状态应用部署\n- **ConfigMap/Secret**: 配置和敏感信息管理\n\n### 架构\n- **Master节点**: API Server、Scheduler、Controller Manager、etcd\n- **Worker节点**: kubelet、kube-proxy、容器运行时\n\n### 核心功能\n- 自动部署和回滚\n- 服务发现和负载均衡\n- 存储编排\n- 自动扩缩容\n- 自愈能力(重启失败容器、替换节点)\n\n### 常用命令\n```bash\n# 部署应用\nkubectl apply -f deployment.yaml\n\n# 查看Pod状态\nkubectl get pods\n\n# 查看日志\nkubectl logs pod_name\n\n# 扩展副本数\nkubectl scale deployment myapp --replicas=3\n```\n\n## 容器编排优势\n- 环境一致性(开发、测试、生产)\n- 快速部署和扩展\n- 资源隔离和利用率高\n- 便于微服务架构实施",
+      "tags": ["Docker", "Kubernetes", "容器", "K8s"],
+      "aliases": ["容器化", "Docker", "K8s"]
+    },
+    {
+      "ref": "network-basics",
+      "title": "网络基础知识",
+      "type": "基础",
+      "summary": "计算机网络核心概念,包括TCP/IP协议、HTTP、DNS等",
+      "content": "## OSI七层模型\n1. 物理层: 比特流传输\n2. 数据链路层: 帧传输(MAC地址)\n3. 网络层: 包传输(IP地址)\n4. 传输层: 段传输(TCP/UDP)\n5. 会话层: 会话管理\n6. 表示层: 数据格式转换\n7. 应用层: 用户接口\n\n## TCP/IP四层模型\n1. 网络接口层: 对应OSI物理层+数据链路层\n2. 网际层: 对应OSI网络层(IP协议)\n3. 传输层: 对应OSI传输层(TCP/UDP)\n4. 应用层: 对应OSI会话层+表示层+应用层\n\n## TCP vs UDP\n### TCP(传输控制协议)\n- 面向连接、可靠传输\n- 三次握手建立连接\n- 流量控制、拥塞控制\n- 适用: HTTP、FTP、SMTP\n\n### UDP(用户数据报协议)\n- 无连接、不可靠\n- 速度快、开销小\n- 适用: 视频流、DNS、游戏\n\n## HTTP协议\n### HTTP方法\n- GET: 获取资源\n- POST: 创建资源\n- PUT: 更新资源(全量)\n- PATCH: 更新资源(部分)\n- DELETE: 删除资源\n\n### HTTP状态码\n- 2xx: 成功(200 OK、201 Created)\n- 3xx: 重定向(301永久、302临时)\n- 4xx: 客户端错误(400 Bad Request、401未授权、404未找到)\n- 5xx: 服务器错误(500内部错误、502网关错误、503服务不可用)\n\n### HTTPS\n- HTTP + SSL/TLS加密\n- 非对称加密交换密钥\n- 对称加密传输数据\n- 端口: 443\n\n## DNS(域名系统)\n- 域名解析: 域名 -> IP地址\n- 解析过程: 本地缓存 -> 本地DNS -> 根DNS -> 顶级DNS -> 权威DNS\n\n## IP地址\n- IPv4: 32位,如192.168.1.1\n- IPv6: 128位,解决IPv4地址不足\n- 子网掩码: 区分网络号和主机号",
+      "tags": ["网络", "TCP/IP", "HTTP", "DNS"],
+      "aliases": ["计算机网络", "网络协议"]
+    },
+    {
+      "ref": "data-structures",
+      "title": "数据结构与算法",
+      "type": "基础",
+      "summary": "计算机科学核心基础,包括常用数据结构和经典算法",
+      "content": "## 常用数据结构\n### 线性结构\n- **数组**: 连续内存,随机访问O(1),插入删除O(n)\n- **链表**: 非连续内存,插入删除O(1),访问O(n)\n- **栈**: 后进先出(LIFO),用于函数调用、括号匹配\n- **队列**: 先进先出(FIFO),用于任务调度、BFS\n\n### 非线性结构\n- **树**: 层次结构\n  - 二叉树: 每个节点最多两个子节点\n  - 二叉搜索树: 左<根<右\n  - 平衡树(AVL、红黑树): 自动平衡,查询O(log n)\n- **图**: 多对多关系\n  - 有向图/无向图\n  - 加权图/无权图\n- **哈希表**: 键值对存储,平均O(1)查找\n\n### 堆(Heap)\n- 完全二叉树\n- 最大堆/最小堆\n- 用于优先队列、堆排序\n\n## 经典算法\n### 排序算法\n| 算法 | 时间复杂度(平均) | 空间复杂度 | 稳定性 |\n|------|----------------|-----------|--------|\n| 冒泡排序 | O(n²) | O(1) | 稳定 |\n| 快速排序 | O(n log n) | O(log n) | 不稳定 |\n| 归并排序 | O(n log n) | O(n) | 稳定 |\n| 堆排序 | O(n log n) | O(1) | 不稳定 |\n\n### 查找算法\n- 二分查找: 有序数组,O(log n)\n- BFS(广度优先搜索): 队列实现,最短路径\n- DFS(深度优先搜索): 栈/递归实现\n\n### 动态规划\n- 将问题分解为重叠子问题\n- 记忆化避免重复计算\n- 经典问题: 背包问题、最长公共子序列\n\n### 贪心算法\n- 每步选择局部最优解\n- 不一定得到全局最优解\n- 经典问题: 活动选择、霍夫曼编码\n\n## 复杂度分析\n- 时间复杂度: 大O表示法\n- 空间复杂度: 额外内存使用\n- 常见复杂度: O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ)",
+      "tags": ["数据结构", "算法", "排序", "复杂度"],
+      "aliases": ["算法", "数据结构与算法"]
+    },
+    {
+      "ref": "security-basics",
+      "title": "网络安全基础",
+      "type": "基础",
+      "summary": "信息安全核心概念,包括加密、认证、常见攻击与防护",
+      "content": "## 信息安全三要素(CIA)\n- **机密性(Confidentiality)**: 防止未授权访问\n- **完整性(Integrity)**: 防止未授权修改\n- **可用性(Availability)**: 确保授权用户可访问\n\n## 加密技术\n### 对称加密\n- 加密和解密使用相同密钥\n- 速度快,适合大量数据\n- 代表: AES、DES、3DES\n\n### 非对称加密\n- 公钥加密,私钥解密\n- 速度慢,适合密钥交换\n- 代表: RSA、ECC\n\n### 哈希算法\n- 单向加密,不可逆\n- 用于密码存储、数据完整性校验\n- 代表: SHA-256、MD5(已不安全)\n\n## 常见攻击与防护\n### SQL注入\n- 攻击: 通过输入恶意SQL语句\n- 防护: 参数化查询、输入验证、ORM\n\n### XSS(跨站脚本攻击)\n- 攻击: 注入恶意脚本到网页\n- 防护: 输入转义、CSP(内容安全策略)\n\n### CSRF(跨站请求伪造)\n- 攻击: 诱导用户执行非预期操作\n- 防护: CSRF Token、SameSite Cookie\n\n### DDoS(分布式拒绝服务)\n- 攻击: 大量请求使服务不可用\n- 防护: 流量清洗、CDN、限流\n\n## 认证与授权\n### 认证(Authentication)\n- 验证用户身份\n- 方式: 密码、双因素认证(2FA)、生物识别\n\n### 授权(Authorization)\n- 验证用户权限\n- 模型: RBAC(基于角色)、ABAC(基于属性)\n\n### JWT(JSON Web Token)\n- 无状态认证\n- 包含用户信息和签名\n- 结构: Header.Payload.Signature\n\n### OAuth 2.0\n- 授权框架\n- 允许第三方应用访问用户资源\n- 流程: 授权码模式、简化模式、密码模式、客户端模式\n\n## 安全最佳实践\n- 使用HTTPS加密传输\n- 密码加盐哈希存储\n- 定期更新依赖和补丁\n- 最小权限原则\n- 安全审计和日志记录",
+      "tags": ["安全", "加密", "认证", "网络安全"],
+      "aliases": ["信息安全", "网络安全"]
+    }
+  ],
+  "edges": [
+    {"source": "it-overview", "target": "python", "relation": "包含"},
+    {"source": "it-overview", "target": "java", "relation": "包含"},
+    {"source": "it-overview", "target": "javascript", "relation": "包含"},
+    {"source": "it-overview", "target": "go-rust", "relation": "包含"},
+    {"source": "it-overview", "target": "database-overview", "relation": "包含"},
+    {"source": "it-overview", "target": "frontend-dev", "relation": "包含"},
+    {"source": "it-overview", "target": "backend-dev", "relation": "包含"},
+    {"source": "it-overview", "target": "cloud-computing", "relation": "包含"},
+    {"source": "it-overview", "target": "microservices", "relation": "包含"},
+    {"source": "it-overview", "target": "devops", "relation": "包含"},
+    {"source": "it-overview", "target": "docker-k8s", "relation": "包含"},
+    {"source": "it-overview", "target": "network-basics", "relation": "包含"},
+    {"source": "it-overview", "target": "data-structures", "relation": "包含"},
+    {"source": "it-overview", "target": "security-basics", "relation": "包含"},
+    {"source": "javascript", "target": "frontend-dev", "relation": "应用于"},
+    {"source": "python", "target": "backend-dev", "relation": "应用于"},
+    {"source": "java", "target": "backend-dev", "relation": "应用于"},
+    {"source": "go-rust", "target": "backend-dev", "relation": "应用于"},
+    {"source": "cloud-computing", "target": "microservices", "relation": "支撑"},
+    {"source": "cloud-computing", "target": "docker-k8s", "relation": "使用"},
+    {"source": "microservices", "target": "devops", "relation": "需要"},
+    {"source": "docker-k8s", "target": "microservices", "relation": "支撑"},
+    {"source": "backend-dev", "target": "database-overview", "relation": "依赖"},
+    {"source": "frontend-dev", "target": "backend-dev", "relation": "调用"},
+    {"source": "network-basics", "target": "security-basics", "relation": "基础"}
+  ]
+}

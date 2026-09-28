@@ -1,0 +1,10 @@
+{
+  "name": "论文阅读助手",
+  "description": "在浏览器中缓存并阅读本地 PDF，自动向 SiinX Agent 提供当前论文上下文。",
+  "version": "1.4.2",
+  "entry": "index.html",
+  "icon": "◫",
+  "accent": "#3978f6",
+  "tags": ["论文", "PDF", "Agent 分析"],
+  "permissions": ["project.files", "project.storage", "agent.chat"]
+}

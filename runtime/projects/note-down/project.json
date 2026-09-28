@@ -1,0 +1,10 @@
+{
+  "name": "知识空间",
+  "description": "轻量、离线优先的 Markdown 快速笔记工具，支持实时预览、图片粘贴和本地保存。",
+  "version": "1.0.0",
+  "entry": "dist/client/index.html",
+  "icon": "✎",
+  "accent": "#2d68f4",
+  "tags": ["笔记", "Markdown", "效率"],
+  "permissions": ["project.files", "project.storage"]
+}

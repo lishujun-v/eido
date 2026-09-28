@@ -1,0 +1,10 @@
+{
+  "name": "图谱工作室",
+  "description": "编写 Mermaid 图表代码，实时渲染并导出为清晰的 PNG 图片。",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "icon": "◇",
+  "accent": "#6378ff",
+  "tags": ["Mermaid", "图表", "开发工具"],
+  "permissions": ["project.storage"]
+}

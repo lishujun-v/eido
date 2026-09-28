@@ -1,0 +1,11 @@
+[project]
+name = "kokoro-tts"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "kokoro>=0.9.4",
+    "misaki[zh]>=0.9.4",
+    "soundfile>=0.14.0",
+]

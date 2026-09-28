@@ -1,0 +1,12 @@
+{
+  "my-research-agent": {
+    "id": "my-research-agent",
+    "name": "Research Agent",
+    "runtime": {
+      "kind": "remote-ndjson",
+      "endpoint": "http://127.0.0.1:8010",
+      "remote_agent_id": "researcher",
+      "protocol_version": "eido-agent/v1"
+    }
+  }
+}

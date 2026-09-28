@@ -1,0 +1,108 @@
+<h2>实现方案对比</h2>
+<p class="subtitle">三种方案，各有侧重</p>
+
+<div class="section">
+  <h3>方案概览</h3>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>纯 Agent 生成 · 零依赖</h3>
+      <p>SKILL.md 提供详细的场景拆解 + 动画编写指南，Agent 从零手写 HTML/CSS/JS。不依赖任何外部框架，生成的动画文件完全自包含。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>模板 + Agent 填充</h3>
+      <p>预置 3-5 个经典动画模板（产品演示模板、数据故事模板、通用叙事模板），Agent 分析故事后选模板，填入内容并调整参数。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>轻量框架 + Agent 编排</h3>
+      <p>Skill 自带一个极简的"动画播放器"引擎（场景管理、转场、字幕同步、TTS 对齐），Agent 只需生成每个场景的内容片段，引擎负责串联播放。</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px;">
+  <h3>详细对比</h3>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 A：纯 Agent 生成</div>
+    <div class="mockup-body" style="padding: 16px;">
+      <div class="pros-cons">
+        <div class="pros"><h4>优点</h4>
+          <ul>
+            <li>零外部依赖，单文件即用</li>
+            <li>最灵活，任何效果都能做</li>
+            <li>SKILL.md 就是全部</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>缺点</h4>
+          <ul>
+            <li>质量依赖模型能力</li>
+            <li>长动画可能结构混乱</li>
+            <li>每次生成差异大</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">方案 B：模板 + 填充</div>
+    <div class="mockup-body" style="padding: 16px;">
+      <div class="pros-cons">
+        <div class="pros"><h4>优点</h4>
+          <ul>
+            <li>输出质量稳定可控</li>
+            <li>场景结构清晰</li>
+            <li>适合常见场景</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>缺点</h4>
+          <ul>
+            <li>模板覆盖有限</li>
+            <li>特殊需求难以适配</li>
+            <li>需要维护模板</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="split" style="margin-top: 16px;">
+  <div class="mockup">
+    <div class="mockup-header">方案 C：引擎 + 编排</div>
+    <div class="mockup-body" style="padding: 16px;">
+      <div class="pros-cons">
+        <div class="pros"><h4>优点</h4>
+          <ul>
+            <li>播放体验统一（进度条/暂停/倍速）</li>
+            <li>TTS 字幕同步精准</li>
+            <li>Agent 只需关注内容</li>
+            <li>场景切换动画统一</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>缺点</h4>
+          <ul>
+            <li>需要开发播放器引擎</li>
+            <li>引擎文件需随 skill 分发</li>
+            <li>可能限制创意自由度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background: var(--bg-success); border: 1px solid var(--border-success); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+    <h3 style="margin-top: 0;">⭐ 推荐：A + C 混合</h3>
+    <p style="margin-bottom: 8px;">以 <strong>方案 C 的播放器引擎</strong> 为骨架，提供统一的播放体验。Agent 在每个场景内部自由使用 <strong>方案 A 的能力</strong>（粒子、Canvas、SVG 等），不受引擎限制。</p>
+    <p style="margin-bottom: 0; font-size: 13px; color: var(--text-secondary);">引擎处理：时间线、场景切换、TTS 同步、字幕、播放控制<br>Agent 处理：每个场景的具体动画内容</p>
+  </div>
+</div>

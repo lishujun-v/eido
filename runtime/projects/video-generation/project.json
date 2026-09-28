@@ -1,0 +1,10 @@
+{
+  "name": "短剧制作",
+  "description": "用连续分镜、参考图和局部重生成，编排可自动接续播放的短剧。",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "icon": "◆",
+  "accent": "#d65d37",
+  "tags": ["AIGC", "分镜", "短剧制作"],
+  "permissions": []
+}

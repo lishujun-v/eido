@@ -1,0 +1,10 @@
+{
+  "name": "模型结构洞察",
+  "description": "输入文本，沿 Token、Embedding、Attention、FFN 到输出观察 Tensor 形状变化，并按需展开模型参数结构。",
+  "version": "1.2.0",
+  "entry": "index.html",
+  "icon": "◎",
+  "accent": "#5b6cf9",
+  "tags": ["深度学习", "模型分析", "结构可视化"],
+  "permissions": []
+}

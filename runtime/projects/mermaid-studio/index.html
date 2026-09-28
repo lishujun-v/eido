@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>图谱工作室 · Mermaid 渲染器</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="studio-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="图谱工作室首页">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>图谱工作室</span>
+        </a>
+        <div class="topbar-meta"><span class="live-dot"></span>本地实时渲染</div>
+        <div class="topbar-actions">
+          <button class="button quiet" id="copyCode" type="button">复制代码</button>
+          <button class="button primary" id="downloadPng" type="button" disabled>下载 PNG <span aria-hidden="true">↓</span></button>
+        </div>
+      </header>
+
+      <section class="workbench" aria-label="Mermaid 图表编辑工作区">
+        <aside class="editor-pane">
+          <div class="pane-heading">
+            <div>
+              <p class="pane-label">SOURCE</p>
+              <h1>让结构浮现</h1>
+            </div>
+            <span class="shortcut">⌘ ↵ 渲染</span>
+          </div>
+
+          <div class="template-row" aria-label="图表模板">
+            <button type="button" class="template active" data-template="flow">流程图</button>
+            <button type="button" class="template" data-template="sequence">时序图</button>
+            <button type="button" class="template" data-template="class">类图</button>
+            <button type="button" class="template" data-template="state">状态图</button>
+          </div>
+
+          <div class="editor-wrap">
+            <div class="line-numbers" id="lineNumbers" aria-hidden="true"></div>
+            <textarea id="source" spellcheck="false" aria-label="Mermaid 代码编辑器"></textarea>
+          </div>
+
+          <div class="editor-footer">
+            <span id="sourceState">已自动保存到此浏览器</span>
+            <button id="resetSample" class="text-button" type="button">恢复示例</button>
+          </div>
+        </aside>
+
+        <section class="preview-pane">
+          <div class="preview-toolbar">
+            <div class="preview-title"><span class="preview-icon" aria-hidden="true">✦</span><span>预览画布</span></div>
+            <span class="canvas-gesture-hint">双指缩放 · 三指拖动</span>
+            <div class="appearance-control">
+              <label for="theme">主题</label>
+              <select id="theme">
+                <option value="dark">深夜蓝图</option>
+                <option value="neutral">中性墨色</option>
+                <option value="forest">森林笔记</option>
+              </select>
+              <label for="maxTextSize">代码上限</label>
+              <select id="maxTextSize" title="允许渲染的 Mermaid 代码最大字符数">
+                <option value="50000">50,000</option>
+                <option value="100000">100,000</option>
+                <option value="500000">500,000</option>
+                <option value="unlimited">无限制</option>
+              </select>
+              <label for="maxEdges">连线上限</label>
+              <select id="maxEdges" title="允许渲染的图表连线最大数量">
+                <option value="500">500</option>
+                <option value="1000">1,000</option>
+                <option value="5000">5,000</option>
+                <option value="unlimited">无限制</option>
+              </select>
+            </div>
+          </div>
+          <div class="canvas-stage" id="canvasStage">
+            <div class="canvas-grid" aria-hidden="true"></div>
+            <div class="render-target" id="renderTarget" aria-live="polite"></div>
+            <div class="empty-state" id="emptyState" hidden>
+              <div class="empty-orb">◇</div>
+              <p>在左侧输入代码，即刻开始绘图。</p>
+            </div>
+          </div>
+          <div class="render-status" id="renderStatus" role="status"><span class="status-mark"></span><span>正在准备画布</span></div>
+        </section>
+      </section>
+    </main>
+    <script src="vendor/mermaid.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

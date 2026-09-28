@@ -1,0 +1,4 @@
+interface:
+  display_name: "Factory 管理"
+  short_description: "创建、查询、修改和可恢复删除业务流水线"
+  default_prompt: "使用 $factory-manage 创建或管理 Factory 中的业务线。"

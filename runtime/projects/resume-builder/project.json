@@ -1,0 +1,10 @@
+{
+  "name": "简历制作工具",
+  "description": "在线编辑专业简历，支持多套模板、实时预览、草稿缓存、智能导入和 PDF 导出。",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "icon": "▤",
+  "accent": "#0f766e",
+  "tags": ["简历", "求职", "效率工具"],
+  "permissions": ["project.storage"]
+}

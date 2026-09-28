@@ -1,0 +1,239 @@
+{
+  "id": "graph-20d753acc3",
+  "name": "专利交底书自动生成",
+  "business_goal": "自动化生成专利交底书文档",
+  "description": "输入专利主题，并行搜索现有技术和相关论文文献，整合现有技术与论文内容，分析创新点、整理方案、生成流程图、格式化为专利交底书并保存为Markdown文件",
+  "status": "draft",
+  "nodes": [
+    {
+      "id": "input",
+      "type": "input",
+      "title": "输入专利主题",
+      "description": "",
+      "config": {
+        "output_schema": {
+          "topic": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "search_prior_art",
+      "type": "work",
+      "title": "搜索现有技术",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "topic": "string"
+        },
+        "output_schema": {
+          "prior_art_analysis": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "search_papers",
+      "type": "work",
+      "title": "检索相关论文文献",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "topic": "string"
+        },
+        "output_schema": {
+          "paper_analysis": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "integrate_references",
+      "type": "work",
+      "title": "整合现有技术与论文内容",
+      "description": "将现有技术分析和论文文献分析进行结构化整合，梳理技术演进脉络、交叉对照方案与方法、归纳技术空白",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "prior_art_analysis": "string",
+          "paper_analysis": "string"
+        },
+        "output_schema": {
+          "integrated_reference": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "analyze_innovation",
+      "type": "work",
+      "title": "分析创新方向",
+      "description": "基于整合后的现有技术与论文内容分析创新方向",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "prior_art_analysis": "string",
+          "paper_analysis": "string",
+          "integrated_reference": "string"
+        },
+        "output_schema": {
+          "innovation_analysis": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "organize_solution",
+      "type": "work",
+      "title": "整理技术方案",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "prior_art_analysis": "string",
+          "paper_analysis": "string",
+          "integrated_reference": "string",
+          "innovation_analysis": "string"
+        },
+        "output_schema": {
+          "technical_solution": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "generate_flowchart",
+      "type": "work",
+      "title": "生成技术流程图",
+      "description": "基于技术方案生成Mermaid流程图",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "prior_art_analysis": "string",
+          "paper_analysis": "string",
+          "integrated_reference": "string",
+          "innovation_analysis": "string",
+          "technical_solution": "string"
+        },
+        "output_schema": {
+          "flowchart_mermaid": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "format_disclosure",
+      "type": "work",
+      "title": "格式化专利交底书",
+      "description": "嵌入流程图和论文引用",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "prior_art_analysis": "string",
+          "paper_analysis": "string",
+          "integrated_reference": "string",
+          "innovation_analysis": "string",
+          "technical_solution": "string",
+          "flowchart_mermaid": "string"
+        },
+        "output_schema": {
+          "document": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "save_document",
+      "type": "work",
+      "title": "保存交底书文件",
+      "description": "保存到当前目录下的outputs目录",
+      "config": {
+        "input_schema": {
+          "topic": "string",
+          "document": "string"
+        },
+        "output_schema": {
+          "file_path": "string"
+        }
+      },
+      "status": "idle"
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "title": "输出结果",
+      "description": "",
+      "config": {
+        "input_schema": {
+          "file_path": "string",
+          "document": "string"
+        }
+      },
+      "status": "idle"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input",
+      "target": "search_prior_art",
+      "label": "",
+      "id": "input-search_prior_art"
+    },
+    {
+      "source": "input",
+      "target": "search_papers",
+      "label": "",
+      "id": "input-search_papers"
+    },
+    {
+      "source": "search_prior_art",
+      "target": "integrate_references",
+      "label": "",
+      "id": "search_prior_art-integrate_references"
+    },
+    {
+      "source": "search_papers",
+      "target": "integrate_references",
+      "label": "",
+      "id": "search_papers-integrate_references"
+    },
+    {
+      "source": "integrate_references",
+      "target": "analyze_innovation",
+      "label": "",
+      "id": "integrate_references-analyze_innovation"
+    },
+    {
+      "source": "analyze_innovation",
+      "target": "organize_solution",
+      "label": "",
+      "id": "analyze_innovation-organize_solution"
+    },
+    {
+      "source": "organize_solution",
+      "target": "generate_flowchart",
+      "label": "",
+      "id": "organize_solution-generate_flowchart"
+    },
+    {
+      "source": "generate_flowchart",
+      "target": "format_disclosure",
+      "label": "",
+      "id": "generate_flowchart-format_disclosure"
+    },
+    {
+      "source": "format_disclosure",
+      "target": "save_document",
+      "label": "",
+      "id": "format_disclosure-save_document"
+    },
+    {
+      "source": "save_document",
+      "target": "output",
+      "label": "",
+      "id": "save_document-output"
+    }
+  ],
+  "created_at": "2026-07-22T06:19:47.589833+00:00",
+  "updated_at": "2026-07-28T12:32:13Z"
+}

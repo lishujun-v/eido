@@ -1,0 +1,16 @@
+{
+  "provider": "openai",
+  "api_base": "https://api.openai.com/v1",
+  "api_key_env": "OPENAI_API_KEY",
+  "model": "gpt-4.1-mini",
+  "temperature": 0.7,
+  "mock_when_no_key": true,
+  "data_dir": "database",
+  "skills_dir": "database/agents/skills",
+  "max_iterations": 200,
+  "max_recent_messages": 24,
+  "max_context_chars": 24000,
+  "compact_after_messages": 40,
+  "compact_keep_messages": 10,
+  "request_timeout_s": 120
+}

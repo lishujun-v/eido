@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>专注看板</title>
+  <style>
+    :root{
+      --bg:#f7f7fb;--surface:#fff;--surface-soft:#fdfdff;--text:#202235;
+      --muted:#74788d;--line:#e5e5ef;--line-soft:#ececf3;--accent:#6558d9;
+      --accent-soft:#f0effc;--green:#238165;--green-soft:#edf8f4;
+      --orange:#a65b22;--orange-soft:#fff3e9;--red:#b6475a;--red-soft:#fff0f2;
+      --shadow:0 12px 36px rgba(41,38,74,.08)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif}
+    button,input,textarea,select{font:inherit}
+    button{color:inherit}
+    .project-stage{display:flex;width:100%;justify-content:center;align-items:flex-start;overflow:visible}
+    .app{width:min(1560px,100%);margin:0;padding:28px 40px 56px 64px;transform-origin:top center;will-change:transform;transition:transform .08s linear}
+    .topbar{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.12em}
+    h1{margin:7px 0 6px;font-size:30px;letter-spacing:-.03em}
+    .sub{margin:0;color:var(--muted);font-size:14px}
+    .primary,.ghost,.quiet,.date-button{border:0;border-radius:11px;cursor:pointer}
+    .primary{padding:11px 16px;background:var(--accent);color:#fff;font-weight:750;box-shadow:0 6px 18px rgba(101,88,217,.22)}
+    .primary:hover{background:#584bc8}
+    .ghost{padding:10px 14px;background:var(--surface);border:1px solid var(--line);font-weight:700}
+    .danger{display:none;margin-right:auto;padding:10px 14px;border:1px solid #f0ccd2;border-radius:11px;background:#fff7f8;color:var(--red);font-weight:700;cursor:pointer}
+    .ghost:hover,.date-button:hover{border-color:#c9c5eb;background:#faf9ff}
+    .date-nav{display:grid;grid-template-columns:110px 1fr 110px;gap:12px;align-items:center;margin:0 0 18px}
+    .date-button{height:42px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:700}
+    .date-center{text-align:center}
+    .date-center strong{display:block;font-size:18px;white-space:nowrap}
+    .date-center span{display:block;margin-top:3px;color:var(--muted);font-size:12px;white-space:nowrap}
+    .summary{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:12px;margin-bottom:18px}
+    .summary-card{min-height:78px;padding:15px 16px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+    .summary-card.featured{background:linear-gradient(135deg,#fff 0%,#f5f3ff 100%);border-color:#dedaf8}
+    .summary-label{color:var(--muted);font-size:12px}
+    .summary-value{margin-top:6px;font-size:21px;font-weight:800}
+    .summary-value.small{font-size:14px;line-height:1.45}
+    .table-shell{position:relative;overflow:visible;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 4px 18px rgba(41,38,74,.035);transition:opacity .18s,transform .18s}
+    .table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line-soft)}
+    .table-toolbar strong{font-size:14px;white-space:nowrap}
+    .table-toolbar span{margin-left:8px;color:var(--muted);font-size:12px;font-weight:400}
+    .toolbar-actions{display:flex;align-items:center;gap:8px}
+    .scale-dock{position:fixed;right:22px;bottom:22px;z-index:30;filter:drop-shadow(0 8px 18px rgba(41,38,74,.12))}
+    .zoom-control{display:flex;align-items:center;gap:6px;margin:0;padding:5px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);font-size:11px;white-space:nowrap}
+    .zoom-control input{width:82px;margin:0;padding:0;border:0;box-shadow:none;accent-color:var(--accent)}
+    .zoom-value{min-width:36px;color:#55596e;text-align:right;font-variant-numeric:tabular-nums}
+    .columns-menu{position:relative}
+    .columns-menu summary{padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:12px;font-weight:700;cursor:pointer;list-style:none}
+    .columns-menu summary::-webkit-details-marker{display:none}
+    .columns-panel{position:absolute;top:40px;right:0;z-index:20;width:170px;max-height:280px;overflow:auto;padding:8px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow)}
+    .columns-panel label{display:flex;align-items:center;gap:8px;margin:0;padding:8px;border-radius:8px;font-weight:500;cursor:pointer}
+    .columns-panel label:hover{background:#f7f7fb}
+    .columns-panel input{width:15px;height:15px;margin:0}
+    .table-viewport{overflow-x:auto;overflow-y:visible;border-radius:0 0 18px 18px}
+    .board{width:100%;border-collapse:collapse;table-layout:fixed;transition:opacity .18s,transform .18s}
+    .board.is-moving{opacity:.35;transform:translateX(var(--move,0))}
+    .board th{position:relative;padding:11px 12px;background:#fafafe;color:#717589;text-align:left;font-size:11px;font-weight:700}
+    .need-header{display:flex;align-items:center;gap:8px}
+    .requirement-add{display:inline-grid;width:20px;height:20px;padding:0;place-items:center;border:1px solid #d7d3f2;border-radius:6px;background:#fff;color:var(--accent);font-size:16px;line-height:1;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+    .requirement-add:hover,.requirement-add:focus-visible{border-color:#aaa2e7;background:var(--accent-soft);transform:scale(1.06)}
+    .requirement-add:disabled{cursor:not-allowed;opacity:.35;transform:none}
+    .column-resizer{position:absolute;top:4px;right:-5px;z-index:4;width:10px;height:calc(100% - 8px);cursor:col-resize;touch-action:none}
+    .column-resizer::after{content:"";position:absolute;top:5px;bottom:5px;left:4px;width:2px;border-radius:2px;background:#c9c6df;opacity:0;transition:opacity .15s,background .15s}
+    .board th:hover .column-resizer::after,.column-resizer:hover::after,.column-resizer.is-resizing::after{opacity:1;background:var(--accent)}
+    .board th:first-child,.board td:first-child{padding-left:16px}
+    .board th:last-child,.board td:last-child{padding-right:16px}
+    .board td{padding:13px 12px;border-top:1px solid var(--line-soft);vertical-align:middle;font-size:12px}
+    .board tbody tr{position:relative;transition:background .15s,opacity .15s}
+    .board tbody tr:hover{background:#fbfaff}
+    .board tbody tr.done{background:var(--green-soft)}
+    .board tbody tr.done:hover{background:#e5f5ef}
+    .task-cell{display:flex;gap:9px;align-items:flex-start}
+    .check{flex:0 0 18px;width:18px;height:18px;margin-top:1px;padding:0;border:1.5px solid #bfc1cf;border-radius:4px;background:#fff;cursor:pointer}
+    .check[aria-checked="true"]{background:var(--green);border-color:var(--green);color:#fff}
+    .check[aria-checked="true"]::after{content:"✓";display:block;text-align:center;font-size:12px;line-height:15px}
+    .card-main{min-width:0;flex:1;cursor:pointer}
+    .card-title{font-size:13px;font-weight:740;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+    .status-actions{display:flex;align-items:center;justify-content:space-between;gap:7px}
+    .delete-row{flex:0 0 auto;padding:4px 7px;border:1px solid #f2d7dc;border-radius:7px;background:#fff7f8;color:var(--red);font-size:10px;font-weight:700;cursor:pointer;opacity:.78}
+    .delete-row:hover{background:var(--red-soft);opacity:1}
+    tr.done td:not(:last-child){color:#568071}
+    tr.done .card-title,tr.done .owner-text,tr.done .progress-note{text-decoration:line-through;color:#68877c}
+    .need{color:#5e6275;font-size:12px;line-height:1.45}
+    .need-group-cell{vertical-align:top!important;background:var(--surface-soft);border-right:1px solid var(--line-soft)}
+    .need-group-cell:hover{background:#f8f7ff}
+    .group-start:not(:first-child) td{border-top-color:#deddea}
+    .need-cell{display:flex;align-items:flex-start;gap:7px}
+    .need-drag{flex:0 0 16px;width:16px;height:22px;margin:-2px 0 0;padding:0;border:0;background:transparent;color:#a4a6b5;font-size:14px;line-height:22px;cursor:grab;touch-action:none;opacity:.55}
+    .need-drag:hover,.need-drag:focus-visible{color:var(--accent);opacity:1}.need-drag:active{cursor:grabbing}
+    .need-cell .need{min-width:0;flex:1}
+    .need-add{flex:0 0 22px;width:22px;height:22px;padding:0;border:1px solid #d9d6f3;border-radius:6px;background:#f8f7ff;color:var(--accent);font-size:17px;line-height:19px;cursor:pointer;opacity:0;transition:opacity .15s,background .15s}
+    tr:hover .need-add,.need-add:focus-visible{opacity:1}
+    .need-add:hover{background:var(--accent-soft)}
+    .tag{padding:3px 7px;border-radius:6px;background:var(--green-soft);color:var(--green);font-size:10px}
+    .tag.high{background:var(--red-soft);color:var(--red)}
+    .tag.medium{background:var(--orange-soft);color:var(--orange)}
+    .tag.owner{background:#f2f3f7;color:#5d6172}
+    .owner-text{color:#5e6275}
+    .need,.owner-text,.progress-note{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+    .progress-note{color:#55596e;font-size:12px;line-height:1.5}
+    .cell-editable{cursor:text}
+    .cell-editable:hover{background:#f8f7ff}
+    .cell-editable[data-field="priority"],.cell-editable[data-field="status"]{cursor:pointer}
+    .cell-editable input,.cell-editable textarea,.cell-editable select{width:100%;margin:-7px 0;padding:7px 8px;border:1px solid #8f84e7;border-radius:8px;background:#fff;font-size:12px;box-shadow:0 0 0 3px rgba(101,88,217,.1)}
+    .cell-editable textarea{min-height:38px;margin:-5px 0;resize:none;overflow:hidden;line-height:1.5}
+    .board tbody tr.dragging-group{opacity:.3;background:var(--accent-soft)}
+    .board tbody tr.drop-before td{box-shadow:inset 0 2px 0 var(--accent)}
+    .board tbody tr.drop-after td{box-shadow:inset 0 -2px 0 var(--accent)}
+    .status{display:inline-block;padding:5px 8px;border-radius:7px;background:#f2f3f7;color:#626679;font-size:10px;font-weight:700;white-space:nowrap}
+    .status.doing{background:var(--accent-soft);color:var(--accent)}
+    .status.done{background:var(--green-soft);color:var(--green)}
+    .empty{padding:48px 24px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+    .empty-add{margin-top:12px;padding:8px 13px;border:1px solid #d9d6f3;border-radius:9px;background:#f8f7ff;color:var(--accent);font-weight:750;cursor:pointer}
+    .inherit{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-2px 0 14px;padding:10px 13px;border:1px solid #dcd8f6;border-radius:12px;background:#f5f3ff;color:#5046a6;font-size:12px}
+    .inherit button{border:0;background:transparent;color:var(--accent);font-weight:750;cursor:pointer}
+    .board-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,300px);gap:18px;align-items:start}
+    .daily-summary{min-width:0;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 4px 18px rgba(41,38,74,.035)}
+    .daily-summary-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:15px 17px;border-bottom:1px solid var(--line-soft)}
+    .daily-summary-head strong{font-size:14px}
+    .daily-summary-head span{color:var(--muted);font-size:12px}
+    .daily-summary-grid{display:grid;grid-template-columns:1fr;gap:0}
+    .daily-summary-field{min-width:0;padding:16px}
+    .daily-summary-field+.daily-summary-field{border-top:1px solid var(--line-soft)}
+    .daily-summary-field label{display:flex;align-items:center;gap:7px;margin-bottom:10px;color:#4d5165;font-size:12px}
+    .summary-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+    .daily-summary-field:nth-child(2) .summary-dot{background:var(--red)}
+    .daily-summary-field:nth-child(3) .summary-dot{background:var(--accent)}
+    .daily-summary-text{display:block;width:100%;min-height:118px;padding:11px 12px;border:1px solid #e1e1eb;border-radius:11px;background:#fcfcff;color:var(--text);font-size:12px;line-height:1.65;resize:none;overflow:hidden;transition:border-color .15s,box-shadow .15s,background .15s}
+    .daily-summary-text:hover:not(:disabled){border-color:#cbc8e5;background:#fff}
+    .daily-summary-text:focus{border-color:#8f84e7;background:#fff;box-shadow:0 0 0 3px rgba(101,88,217,.1)}
+    .daily-summary-text:disabled{border-color:transparent;background:#fafafe;color:#666a7d;cursor:default}
+    .tip{margin:14px 2px 0;color:#9295a5;text-align:center;font-size:11px}
+    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(32,34,53,.32);backdrop-filter:blur(4px);z-index:10}
+    .modal-backdrop.open{display:flex}
+    .modal{width:min(580px,100%);max-height:90vh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+    .modal h2{margin:0;font-size:20px}
+    .modal-sub{margin:5px 0 0;color:var(--muted);font-size:12px}
+    .close{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field.full{grid-column:1/-1}
+    label{display:block;margin-bottom:7px;color:#52566a;font-size:12px;font-weight:700}
+    input,textarea,select{width:100%;padding:10px 11px;border:1px solid #dcdde6;border-radius:10px;background:#fff;color:var(--text);outline:none}
+    textarea{min-height:82px;resize:vertical;line-height:1.5}
+    input:focus,textarea:focus,select:focus{border-color:#8f84e7;box-shadow:0 0 0 3px rgba(101,88,217,.1)}
+    .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft)}
+    .toast{position:fixed;right:24px;bottom:72px;display:none;padding:11px 14px;border:1px solid #d5e9e2;border-radius:11px;background:#f4fbf8;color:var(--green);font-size:12px;box-shadow:var(--shadow)}
+    .toast.show{display:block}
+    @media(max-width:1140px){
+      .board-workspace{grid-template-columns:1fr}.daily-summary{margin-top:18px}.daily-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.daily-summary-field+.daily-summary-field{border-top:0;border-left:1px solid var(--line-soft)}
+    }
+    @media(max-width:850px){
+      .app{padding:26px 20px 44px 64px}.summary{grid-template-columns:1fr 1fr}
+      .board th{padding:10px 8px}.board td{padding:11px 8px}.board th:first-child,.board td:first-child{padding-left:12px}.board th:last-child,.board td:last-child{padding-right:12px}
+    }
+    @media(max-width:650px){
+      .table-shell{overflow:visible;border:0;background:transparent;box-shadow:none}.table-toolbar{margin-bottom:10px;border:1px solid var(--line);border-radius:13px;background:#fff}
+      .board,.board tbody{display:block}.board thead{display:none}.board tr{display:grid;grid-template-columns:1fr 1fr;margin-bottom:10px;padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff}
+      .board td{display:block;padding:6px 8px!important;border:0}.board td[data-col="title"],.board td[data-col="progress"]{grid-column:1/-1}.board td::before{display:block;margin-bottom:3px;color:var(--muted);font-size:10px}.board td[data-col="need"]::before{content:"所属需求"}.board td[data-col="title"]::before{content:"任务"}.board td[data-col="priority"]::before{content:"优先级"}.board td[data-col="owner"]::before{content:"负责人"}.board td[data-col="progress"]::before{content:"当日进展"}.board td[data-col="status"]::before{content:"状态"}
+      .board td.need-group-cell{grid-column:1/-1;background:#f8f7ff;border-bottom:1px solid var(--line-soft)}
+      .board td.empty-cell{grid-column:1/-1}.board td.empty-cell::before{display:none;content:""}
+      .delete-row{visibility:visible}
+      .need-add{opacity:1}.column-resizer{display:none}.zoom-control input{width:62px}
+      .daily-summary-grid{grid-template-columns:1fr}.daily-summary-field+.daily-summary-field{border-top:1px solid var(--line-soft);border-left:0}.daily-summary-text{min-height:92px}
+    }
+    @media(max-width:560px){
+      .date-nav{grid-template-columns:82px 1fr 82px}
+      .summary{grid-template-columns:1fr}.summary-card{min-height:auto}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="project-stage" id="projectStage">
+  <main class="app">
+    <nav class="date-nav" aria-label="日期切换">
+      <button class="date-button" id="previousDay">前一天</button>
+      <div class="date-center">
+        <strong id="dateTitle"></strong>
+        <span id="dateMeta"></span>
+      </div>
+      <button class="date-button" id="nextDay">后一天</button>
+    </nav>
+
+    <div class="board-workspace">
+    <section class="table-shell">
+      <div class="table-toolbar">
+        <strong>全部任务<span id="taskTotal">共 0 项</span></strong>
+        <div class="toolbar-actions">
+          <details class="columns-menu">
+            <summary>显示列</summary>
+            <div class="columns-panel">
+              <label><input type="checkbox" data-column="need" checked>所属需求</label>
+              <label><input type="checkbox" data-column="title" checked>任务</label>
+              <label><input type="checkbox" data-column="priority" checked>优先级</label>
+              <label><input type="checkbox" data-column="owner" checked>负责人</label>
+              <label><input type="checkbox" data-column="progress" checked>当日进展</label>
+              <label><input type="checkbox" data-column="status" checked>状态</label>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="table-viewport" id="tableViewport">
+      <table class="board" id="board" aria-live="polite">
+        <colgroup>
+          <col data-width-col="need"><col data-width-col="title"><col data-width-col="priority">
+          <col data-width-col="owner"><col data-width-col="progress"><col data-width-col="status">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="col-need" data-col="need"><div class="need-header"><span>所属需求</span><button class="requirement-add" id="addRequirement" type="button" aria-label="新增所属需求" title="在末尾新增所属需求">+</button></div><span class="column-resizer" data-resize-col="need" aria-hidden="true"></span></th>
+            <th class="col-task" data-col="title">任务<span class="column-resizer" data-resize-col="title" aria-hidden="true"></span></th>
+            <th class="col-priority" data-col="priority">优先级<span class="column-resizer" data-resize-col="priority" aria-hidden="true"></span></th>
+            <th class="col-owner" data-col="owner">负责人<span class="column-resizer" data-resize-col="owner" aria-hidden="true"></span></th>
+            <th class="col-progress" data-col="progress">当日进展<span class="column-resizer" data-resize-col="progress" aria-hidden="true"></span></th>
+            <th class="col-status" data-col="status">状态<span class="column-resizer" data-resize-col="status" aria-hidden="true"></span></th>
+          </tr>
+        </thead>
+        <tbody id="taskRows"></tbody>
+      </table>
+      </div>
+    </section>
+
+    <section class="daily-summary" aria-labelledby="dailySummaryTitle">
+      <div class="daily-summary-head">
+        <strong id="dailySummaryTitle">今日总结</strong>
+        <span id="dailySummaryMeta">内容自动保存</span>
+      </div>
+      <div class="daily-summary-grid">
+        <div class="daily-summary-field">
+          <label for="summaryProgress"><span class="summary-dot"></span>昨日进展</label>
+          <textarea class="daily-summary-text" id="summaryProgress" data-summary-field="progress" placeholder="回顾昨天完成的工作与关键结果"></textarea>
+        </div>
+        <div class="daily-summary-field">
+          <label for="summaryRisk"><span class="summary-dot"></span>风险</label>
+          <textarea class="daily-summary-text" id="summaryRisk" data-summary-field="risk" placeholder="记录风险、阻塞项和需要协助的事项"></textarea>
+        </div>
+        <div class="daily-summary-field">
+          <label for="summaryPlan"><span class="summary-dot"></span>今日事项</label>
+          <textarea class="daily-summary-text" id="summaryPlan" data-summary-field="plan" placeholder="列出今天准备推进的重点"></textarea>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+  </div>
+  <div class="scale-dock">
+    <label class="zoom-control" for="boardZoom">界面缩放
+      <input id="boardZoom" type="range" min="70" max="140" step="5" value="100" aria-label="整个专注看板界面缩放比例">
+      <span class="zoom-value" id="zoomValue">100%</span>
+    </label>
+  </div>
+  <div class="toast" id="toast">已保存到今天的任务视图</div>
+
+  <script>
+    const STORAGE_KEY="focus-board-v2";
+    const pending=new Map();
+    let saveQueue=Promise.resolve();
+    let today=startOfDay(new Date());
+    let selectedDate=new Date(today);
+    let state={version:2,days:{}};
+    const visibleColumns={need:true,title:true,priority:true,owner:true,progress:true,status:true};
+    const defaultColumnRatios={need:.18,title:.25,priority:.11,owner:.11,progress:.25,status:.10};
+    let columnWidths={};
+    let projectScale=100;
+    const app=document.querySelector(".app");
+    const projectStage=document.querySelector("#projectStage");
+    const board=document.querySelector("#board");
+    const taskRows=document.querySelector("#taskRows");
+    const tableViewport=document.querySelector("#tableViewport");
+    const boardZoom=document.querySelector("#boardZoom");
+    const addRequirementButton=document.querySelector("#addRequirement");
+
+    function startOfDay(date){return new Date(date.getFullYear(),date.getMonth(),date.getDate())}
+    function dateKey(date){
+      const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,"0"),d=String(date.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+    function newTaskId(){
+      return `task_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
+    }
+    function cloneTasksForNextDay(tasks){
+      return (tasks||[]).map(task=>({
+        ...JSON.parse(JSON.stringify(task)),
+        id:newTaskId(),
+        progress:"",
+        createdAt:new Date().toISOString()
+      }));
+    }
+    function emptyDailySummary(){return {progress:"",risk:"",plan:""}}
+    function normalizedDailySummary(value){return {...emptyDailySummary(),...(value&&typeof value==="object"?value:{})}}
+    function ensureDay(date){
+      const key=dateKey(date);
+      if(state.days[key]){
+        state.days[key].summary=normalizedDailySummary(state.days[key].summary);
+        return state.days[key];
+      }
+      state.days[key]={createdAt:new Date().toISOString(),tasks:[],summary:emptyDailySummary()};
+      return state.days[key];
+    }
+    function createDayFromPrevious(date){
+      const key=dateKey(date);
+      if(state.days[key])return false;
+      const previousDate=new Date(startOfDay(date));
+      previousDate.setDate(previousDate.getDate()-1);
+      const previousKey=dateKey(previousDate);
+      const previousDay=state.days[previousKey];
+      state.days[key]={
+        createdAt:new Date().toISOString(),
+        copiedFrom:previousDay?previousKey:null,
+        tasks:cloneTasksForNextDay(previousDay?.tasks||[]),
+        summary:emptyDailySummary()
+      };
+      return true;
+    }
+    function ensureDayByInheritance(date){
+      const target=startOfDay(date);
+      const targetKey=dateKey(target);
+      if(state.days[targetKey])return false;
+      const earlierKeys=Object.keys(state.days)
+        .filter(key=>/^\d{4}-\d{2}-\d{2}$/.test(key)&&key<targetKey)
+        .sort();
+      if(!earlierKeys.length){
+        ensureDay(target);
+        return true;
+      }
+      const [year,month,day]=earlierKeys[earlierKeys.length-1].split("-").map(Number);
+      const cursor=new Date(year,month-1,day);
+      let created=false;
+      while(dateKey(cursor)<targetKey){
+        cursor.setDate(cursor.getDate()+1);
+        created=createDayFromPrevious(cursor)||created;
+      }
+      return created;
+    }
+    function tasksForDay(){
+      const key=dateKey(selectedDate);
+      return state.days[key]?.tasks||[];
+    }
+    function editableTasks(){return ensureDay(selectedDate).tasks}
+    function dayOffset(){return Math.round((startOfDay(selectedDate)-today)/86400000)}
+    function escapeHtml(value){
+      return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+    }
+    function storedTaskCount(value){
+      if(!value?.days||typeof value.days!=="object")return 0;
+      return Object.values(value.days).reduce((total,day)=>total+(Array.isArray(day?.tasks)?day.tasks.length:0),0);
+    }
+    function callEido(capability,payload){
+      if(window.parent===window)return Promise.reject(new Error("standalone"));
+      const requestId=`req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      return new Promise((resolve,reject)=>{
+        const timer=setTimeout(()=>{pending.delete(requestId);reject(new Error("timeout"))},1200);
+        pending.set(requestId,{resolve:value=>{clearTimeout(timer);resolve(value)},reject:error=>{clearTimeout(timer);reject(error)}});
+        window.parent.postMessage({type:"eido:project-request",requestId,capability,payload},"*");
+      });
+    }
+    window.addEventListener("message",event=>{
+      if(event.source!==window.parent||event.data?.type!=="eido:project-response")return;
+      const request=pending.get(event.data.requestId);
+      if(!request)return;
+      pending.delete(event.data.requestId);
+      event.data.ok?request.resolve(event.data.result):request.reject(new Error(event.data.error||"存储失败"));
+    });
+    async function loadState(){
+      let diskStored=null;
+      let localStored=null;
+      try{
+        const result=await callEido("project.storage",{action:"get",key:STORAGE_KEY});
+        diskStored=result?.value;
+      }catch(error){}
+      try{localStored=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null")}catch(parseError){}
+      const diskTime=Date.parse(diskStored?.updatedAt||"")||0;
+      const localTime=Date.parse(localStored?.updatedAt||"")||0;
+      const recoverLocal=storedTaskCount(diskStored)===0&&storedTaskCount(localStored)>0;
+      const stored=!diskStored?localStored:!localStored?diskStored:localTime>diskTime||recoverLocal?localStored:diskStored;
+      if(stored&&stored.version===2&&stored.days&&typeof stored.days==="object")state=stored;
+      if(state.settings?.visibleColumns)Object.assign(visibleColumns,state.settings.visibleColumns);
+      if(state.settings?.columnWidths)columnWidths={...state.settings.columnWidths};
+      const savedScale=state.settings?.projectScale??state.settings?.boardScale;
+      if(Number.isFinite(Number(savedScale)))projectScale=Math.min(140,Math.max(70,Number(savedScale)));
+      document.querySelectorAll("[data-column]").forEach(input=>{input.checked=visibleColumns[input.dataset.column]!==false});
+      boardZoom.value=String(projectScale);
+      applyProjectScale();
+      ensureDayByInheritance(today);
+      await saveState(false);
+    }
+    async function saveState(notifyFailure=true){
+      state.updatedAt=new Date().toISOString();
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(error){}
+      const snapshot=JSON.parse(JSON.stringify(state));
+      const diskSave=saveQueue.then(()=>callEido("project.storage",{action:"set",key:STORAGE_KEY,value:snapshot}));
+      saveQueue=diskSave.catch(()=>{});
+      try{
+        await diskSave;
+        return true;
+      }catch(error){
+        if(notifyFailure)showToast("已保存在当前浏览器，项目同步稍后重试");
+        return false;
+      }
+    }
+    function formatDate(){
+      const offset=dayOffset();
+      const dateText=`${selectedDate.getMonth()+1}月${selectedDate.getDate()}日`;
+      const label=offset===0?"今天":offset===-1?"昨天":offset===1?"明天":"";
+      document.querySelector("#dateTitle").textContent=label?`${dateText} · ${label}`:dateText;
+      document.querySelector("#dateMeta").textContent=offset<0?"历史记录 · 可独立编辑":offset>0?"独立任务视图 · 修改不会影响前一天":"每日进展自动保存";
+    }
+    function priorityLabel(priority){return priority==="high"?"高优先级":priority==="medium"?"中优先级":"低优先级"}
+    function statusLabel(status){return status==="todo"?"待安排":status==="doing"?"进行中":"已完成"}
+    function requirementKey(task){return String(task.need||"").trim()}
+    function requirementGroups(tasks){
+      const groups=[];
+      const byKey=new Map();
+      tasks.forEach(task=>{
+        const key=requirementKey(task);
+        if(!byKey.has(key)){
+          const group={key,tasks:[]};
+          byKey.set(key,group);groups.push(group);
+        }
+        byKey.get(key).tasks.push(task);
+      });
+      return groups;
+    }
+    function taskRow(task,offset,group,index){
+      const positionClass=`${index===0?" group-start":""}${index===group.tasks.length-1?" group-end":""}`;
+      const needCell=index===0?`<td class="cell-editable need-group-cell" data-col="need" data-field="need" rowspan="${group.tasks.length}" title="点击编辑需求组"><div class="need-cell"><button class="need-drag" type="button" data-drag-need="${escapeHtml(task.id)}" aria-label="拖动调整该需求及其全部任务的位置" title="按住并上下拖动整组需求">⠿</button><span class="need">${escapeHtml(task.need||"未填写需求")}</span><button class="need-add" type="button" data-add-need="${escapeHtml(task.id)}" aria-label="为该需求新增任务" title="为该需求新增任务">+</button></div></td>`:"";
+      return `<tr class="${task.status==="done"?"done":""}${positionClass}" data-id="${escapeHtml(task.id)}">
+        ${needCell}
+        <td class="cell-editable" data-col="title" data-field="title" title="点击编辑"><div class="task-cell"><button class="check" type="button" role="checkbox" aria-checked="${task.status==="done"}" data-check="${escapeHtml(task.id)}" aria-label="${task.status==="done"?"标记为未完成":"标记为已完成"}"></button><div class="card-title">${escapeHtml(task.title||"未命名任务")}</div></div></td>
+        <td class="cell-editable" data-col="priority" data-field="priority" title="点击编辑"><span class="tag ${escapeHtml(task.priority)}">${priorityLabel(task.priority)}</span></td>
+        <td class="cell-editable" data-col="owner" data-field="owner" title="点击编辑"><span class="owner-text">${escapeHtml(task.owner||"未分配")}</span></td>
+        <td class="cell-editable" data-col="progress" data-field="progress" title="点击编辑"><div class="progress-note">${escapeHtml(task.progress||"还没有填写进展")}</div></td>
+        <td class="cell-editable" data-col="status" data-field="status" title="点击编辑"><div class="status-actions"><span class="status ${escapeHtml(task.status)}">${statusLabel(task.status)}</span><button class="delete-row" type="button" aria-label="删除任务：${escapeHtml(task.title||"未命名任务")}" data-delete="${escapeHtml(task.id)}">删除</button></div></td>
+      </tr>`;
+    }
+    function applyColumnVisibility(){
+      Object.entries(visibleColumns).forEach(([column,visible])=>{
+        document.querySelectorAll(`[data-col="${column}"]`).forEach(cell=>cell.style.display=visible?"":"none");
+        const col=document.querySelector(`[data-width-col="${column}"]`);
+        if(col)col.style.display=visible?"":"none";
+      });
+    }
+    function ensureColumnWidths(){
+      const base=Math.max(tableViewport.clientWidth||0,760);
+      Object.entries(defaultColumnRatios).forEach(([column,ratio])=>{
+        if(!Number.isFinite(Number(columnWidths[column])))columnWidths[column]=Math.round(base*ratio);
+      });
+    }
+    function applyColumnWidths(){
+      if(window.matchMedia("(max-width: 650px)").matches){board.style.width="";return}
+      ensureColumnWidths();
+      let total=0;
+      Object.entries(columnWidths).forEach(([column,width])=>{
+        const col=document.querySelector(`[data-width-col="${column}"]`);
+        if(col)col.style.width=`${Math.max(72,Number(width))}px`;
+        if(visibleColumns[column]!==false)total+=Math.max(72,Number(width));
+      });
+      board.style.width=`${Math.max(total,tableViewport.clientWidth)}px`;
+    }
+    let scaleFrame=null;
+    function applyProjectScale(commitLayout=true){
+      boardZoom.value=String(projectScale);
+      document.querySelector("#zoomValue").textContent=`${projectScale}%`;
+      if(scaleFrame)cancelAnimationFrame(scaleFrame);
+      scaleFrame=requestAnimationFrame(()=>{
+        const scale=projectScale/100;
+        if(commitLayout){
+          const availableWidth=document.documentElement.clientWidth;
+          app.style.width=`${Math.min(1560,availableWidth/scale)}px`;
+        }
+        app.style.transform=`scale(${scale})`;
+        if(commitLayout)updateProjectStage();
+        scaleFrame=null;
+      });
+    }
+    function updateProjectStage(){
+      projectStage.style.height=`${Math.ceil(app.offsetHeight*(projectScale/100))}px`;
+    }
+    function growSummaryTextarea(textarea){
+      textarea.style.height="auto";
+      textarea.style.height=`${Math.max(118,textarea.scrollHeight)}px`;
+    }
+    function renderDailySummary(){
+      const summary=normalizedDailySummary(state.days[dateKey(selectedDate)]?.summary);
+      document.querySelectorAll("[data-summary-field]").forEach(textarea=>{
+        textarea.value=summary[textarea.dataset.summaryField]||"";
+        textarea.disabled=false;
+        growSummaryTextarea(textarea);
+      });
+      document.querySelector("#dailySummaryMeta").textContent="内容自动保存";
+    }
+    function render(){
+      formatDate();
+      const tasks=tasksForDay();
+      const offset=dayOffset();
+      const columnCount=Object.values(visibleColumns).filter(Boolean).length||1;
+      taskRows.innerHTML=tasks.length
+        ?requirementGroups(tasks).map(group=>group.tasks.map((task,index)=>taskRow(task,offset,group,index)).join("")).join("")
+        :`<tr><td class="empty-cell" colspan="${columnCount}"><div class="empty">当前日期还没有任务<br>从第一条任务开始吧<br><button class="empty-add" type="button" data-add-empty>+ 新增任务</button></div></td></tr>`;
+      document.querySelector("#taskTotal").textContent=`共 ${tasks.length} 项`;
+      addRequirementButton.disabled=false;
+      applyColumnVisibility();
+      applyColumnWidths();
+      renderDailySummary();
+      requestAnimationFrame(updateProjectStage);
+    }
+    let dateMoveTimer=null;
+    function moveDay(delta){
+      if(dateMoveTimer)return;
+      const targetDate=new Date(selectedDate);
+      targetDate.setDate(targetDate.getDate()+delta);
+      let createdFromCurrent=false;
+      if(delta>0){
+        const targetKey=dateKey(targetDate);
+        if(!state.days[targetKey]){
+          ensureDayByInheritance(targetDate);
+          createdFromCurrent=true;
+          saveState(false);
+        }
+      }
+      board.style.setProperty("--move",delta>0?"-18px":"18px");
+      board.classList.add("is-moving");
+      dateMoveTimer=setTimeout(()=>{
+        selectedDate=targetDate;
+        render();
+        board.classList.remove("is-moving");
+        dateMoveTimer=null;
+        if(createdFromCurrent)showToast("已基于前一天创建独立任务列表");
+      },160);
+    }
+    function editorFor(field,value){
+      if(field==="priority"||field==="status"){
+        const select=document.createElement("select");
+        const options=field==="priority"
+          ?[["high","高优先级"],["medium","中优先级"],["low","低优先级"]]
+          :[["todo","待安排"],["doing","进行中"],["done","已完成"]];
+        options.forEach(([optionValue,label])=>{
+          const option=document.createElement("option");
+          option.value=optionValue;option.textContent=label;option.selected=optionValue===value;
+          select.appendChild(option);
+        });
+        return select;
+      }
+      const input=document.createElement("textarea");
+      input.value=value||"";
+      return input;
+    }
+    function autoGrow(editor){
+      if(editor.tagName!=="TEXTAREA")return;
+      editor.style.height="auto";
+      editor.style.height=`${Math.max(38,editor.scrollHeight)}px`;
+    }
+    function startCellEdit(cell){
+      if(cell.querySelector("input,textarea,select"))return;
+      const row=cell.closest("tr");
+      const task=editableTasks().find(item=>String(item.id)===String(row.dataset.id));
+      const field=cell.dataset.field;
+      if(!task||!field)return;
+      const original=task[field]||"";
+      const editor=editorFor(field,original);
+      cell.replaceChildren(editor);
+      editor.focus();
+      if(editor.tagName==="SELECT"&&editor.showPicker){
+        try{editor.showPicker()}catch(error){}
+      }else if(editor.select)editor.select();
+      autoGrow(editor);
+      editor.addEventListener("input",()=>autoGrow(editor));
+      let finished=false;
+      let isComposing=false;
+      const finish=async cancel=>{
+        if(finished)return;
+        finished=true;
+        let value=cancel?original:editor.value.trim();
+        if(field==="title"&&!value)value="未命名任务";
+        if(field==="need"){
+          const key=requirementKey(task);
+          editableTasks().forEach(item=>{if(requirementKey(item)===key)item.need=value});
+        }else task[field]=value;
+        render();
+        if(!cancel){
+          const synced=await saveState();
+          if(synced)showToast("已保存");
+        }
+      };
+      editor.addEventListener("blur",()=>finish(false));
+      editor.addEventListener("change",()=>{if(editor.tagName==="SELECT")finish(false)});
+      editor.addEventListener("compositionstart",()=>{isComposing=true});
+      editor.addEventListener("compositionend",()=>{isComposing=false});
+      editor.addEventListener("keydown",event=>{
+        if(event.isComposing||isComposing||event.keyCode===229)return;
+        if(event.key==="Escape"){event.preventDefault();finish(true)}
+        if(event.key==="Enter"&&editor.tagName==="SELECT"){event.preventDefault();finish(false)}
+        if(event.key==="Enter"&&editor.tagName==="TEXTAREA"&&(event.metaKey||event.ctrlKey)){event.preventDefault();finish(false)}
+      });
+    }
+    async function addTask(options={}){
+      const id=newTaskId();
+      const tasks=editableTasks();
+      const task={id,need:options.need||"",title:"新任务",priority:"medium",owner:"",progress:"",status:"todo",createdAt:new Date().toISOString()};
+      const index=Number.isInteger(options.index)?Math.min(Math.max(options.index,0),tasks.length):tasks.length;
+      tasks.splice(index,0,task);
+      render();
+      await saveState();
+      const row=[...taskRows.querySelectorAll("tr")].find(item=>item.dataset.id===id);
+      const focusCell=row?.querySelector(`[data-field="${options.focusField||"title"}"]`);
+      if(focusCell)startCellEdit(focusCell);
+    }
+    function addForNeed(id){
+      const tasks=editableTasks();
+      const source=tasks.find(item=>String(item.id)===String(id));
+      if(!source)return;
+      let index=tasks.length;
+      for(let cursor=tasks.length-1;cursor>=0;cursor--){
+        if((tasks[cursor].need||"")===(source.need||"")){index=cursor+1;break}
+      }
+      addTask({index,need:source.need||""});
+    }
+    function addRequirement(){
+      const names=new Set(editableTasks().map(task=>requirementKey(task)));
+      let number=1;
+      let name="新需求";
+      while(names.has(name))name=`新需求 ${++number}`;
+      addTask({index:editableTasks().length,need:name,focusField:"need"});
+    }
+    async function toggleTask(id){
+      const task=editableTasks().find(item=>String(item.id)===String(id));
+      if(!task)return;
+      task.status=task.status==="done"?"todo":"done";
+      render();
+      const synced=await saveState();
+      if(synced)showToast(task.status==="done"?"任务已完成":"任务已恢复");
+    }
+    async function deleteTask(id){
+      if(!window.confirm("确定删除这条任务吗？"))return;
+      const tasks=editableTasks();
+      const index=tasks.findIndex(item=>String(item.id)===String(id));
+      if(index<0)return;
+      tasks.splice(index,1);
+      render();
+      const synced=await saveState();
+      if(synced)showToast("任务已删除");
+    }
+    function showToast(message){
+      const toast=document.querySelector("#toast");
+      toast.textContent=message;toast.classList.add("show");
+      clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2200);
+    }
+    document.querySelector("#previousDay").addEventListener("click",()=>moveDay(-1));
+    document.querySelector("#nextDay").addEventListener("click",()=>moveDay(1));
+    addRequirementButton.addEventListener("click",addRequirement);
+    board.addEventListener("click",event=>{
+      if(event.target.closest("[data-drag-need]")){event.stopPropagation();return}
+      const checkButton=event.target.closest("[data-check]");
+      if(checkButton){event.stopPropagation();toggleTask(checkButton.dataset.check);return}
+      const needButton=event.target.closest("[data-add-need]");
+      if(needButton){event.stopPropagation();addForNeed(needButton.dataset.addNeed);return}
+      if(event.target.closest("[data-add-empty]")){event.stopPropagation();addTask();return}
+      const deleteButton=event.target.closest("[data-delete]");
+      if(deleteButton){event.stopPropagation();deleteTask(deleteButton.dataset.delete);return}
+      const cell=event.target.closest(".cell-editable");
+      if(cell)startCellEdit(cell);
+    });
+    document.querySelectorAll("[data-column]").forEach(input=>input.addEventListener("change",event=>{
+      visibleColumns[event.currentTarget.dataset.column]=event.currentTarget.checked;
+      if(!Object.values(visibleColumns).some(Boolean)){
+        event.currentTarget.checked=true;
+        visibleColumns[event.currentTarget.dataset.column]=true;
+      }
+      state.settings={...(state.settings||{}),visibleColumns:{...visibleColumns}};
+      render();
+      saveState(false);
+    }));
+    boardZoom.addEventListener("input",event=>{
+      projectScale=Number(event.currentTarget.value);
+      applyProjectScale(false);
+    });
+    boardZoom.addEventListener("change",()=>{
+      applyProjectScale(true);
+      state.settings={...(state.settings||{}),projectScale,columnWidths:{...columnWidths}};
+      saveState(false);
+    });
+
+    let summarySaveTimer=null;
+    function queueSummarySave(){
+      clearTimeout(summarySaveTimer);
+      summarySaveTimer=setTimeout(()=>saveState(false),450);
+    }
+    document.querySelectorAll("[data-summary-field]").forEach(textarea=>{
+      textarea.addEventListener("input",event=>{
+        const target=event.currentTarget;
+        ensureDay(selectedDate).summary[target.dataset.summaryField]=target.value;
+        growSummaryTextarea(target);
+        queueSummarySave();
+        requestAnimationFrame(updateProjectStage);
+      });
+      textarea.addEventListener("blur",async()=>{
+        clearTimeout(summarySaveTimer);
+        await saveState(false);
+      });
+    });
+
+    let resizeState=null;
+    board.addEventListener("pointerdown",event=>{
+      const handle=event.target.closest("[data-resize-col]");
+      if(!handle||window.matchMedia("(max-width: 650px)").matches)return;
+      event.preventDefault();event.stopPropagation();
+      const column=handle.dataset.resizeCol;
+      const header=handle.closest("th");
+      const scale=header.getBoundingClientRect().width/header.offsetWidth||1;
+      board.querySelectorAll("th[data-col]").forEach(item=>{
+        if(visibleColumns[item.dataset.col]!==false)columnWidths[item.dataset.col]=item.offsetWidth;
+      });
+      resizeState={column,startX:event.clientX,startWidth:header.offsetWidth,scale,handle};
+      handle.classList.add("is-resizing");
+      document.body.style.cursor="col-resize";
+      document.body.style.userSelect="none";
+    });
+    document.addEventListener("pointermove",event=>{
+      if(!resizeState)return;
+      const delta=(event.clientX-resizeState.startX)/resizeState.scale;
+      columnWidths[resizeState.column]=Math.max(72,Math.round(resizeState.startWidth+delta));
+      applyColumnWidths();
+    });
+    document.addEventListener("pointerup",()=>{
+      if(!resizeState)return;
+      resizeState.handle.classList.remove("is-resizing");
+      resizeState=null;document.body.style.cursor="";document.body.style.userSelect="";
+      state.settings={...(state.settings||{}),columnWidths:{...columnWidths},projectScale};
+      saveState(false);
+    });
+
+    let dragState=null;
+    function clearDragMarkers(){
+      taskRows.querySelectorAll(".dragging-group,.drop-before,.drop-after").forEach(row=>row.classList.remove("dragging-group","drop-before","drop-after"));
+    }
+    function markDraggedRequirement(){
+      if(!dragState)return;
+      const tasks=editableTasks();
+      taskRows.querySelectorAll("tr[data-id]").forEach(row=>{
+        const task=tasks.find(item=>String(item.id)===String(row.dataset.id));
+        if(task&&requirementKey(task)===dragState.key)row.classList.add("dragging-group");
+      });
+    }
+    board.addEventListener("pointerdown",event=>{
+      const handle=event.target.closest("[data-drag-need]");
+      if(!handle)return;
+      const tasks=editableTasks();
+      const source=tasks.find(task=>String(task.id)===String(handle.dataset.dragNeed));
+      if(!source)return;
+      event.preventDefault();event.stopPropagation();
+      dragState={key:requirementKey(source),startY:event.clientY,pointerId:event.pointerId,handle,active:false};
+      handle.setPointerCapture?.(event.pointerId);
+    });
+    board.addEventListener("pointermove",event=>{
+      if(!dragState)return;
+      if(!dragState.active&&Math.abs(event.clientY-dragState.startY)>4){dragState.active=true;markDraggedRequirement()}
+      if(!dragState.active)return;
+      event.preventDefault();
+      const row=document.elementFromPoint(event.clientX,event.clientY)?.closest("tr[data-id]");
+      if(!row)return;
+      const target=editableTasks().find(task=>String(task.id)===String(row.dataset.id));
+      if(!target||requirementKey(target)===dragState.key)return;
+      taskRows.querySelectorAll(".drop-before,.drop-after").forEach(item=>item.classList.remove("drop-before","drop-after"));
+      const after=event.clientY>row.getBoundingClientRect().top+row.getBoundingClientRect().height/2;
+      row.classList.add(after?"drop-after":"drop-before");
+      dragState.targetKey=requirementKey(target);dragState.after=after;
+    });
+    board.addEventListener("pointerup",async event=>{
+      if(!dragState)return;
+      dragState.handle.releasePointerCapture?.(dragState.pointerId);
+      if(!dragState.active||!dragState.targetKey){dragState=null;clearDragMarkers();return}
+      event.preventDefault();event.stopPropagation();
+      const tasks=editableTasks();
+      const moved=tasks.filter(task=>requirementKey(task)===dragState.key);
+      const remaining=tasks.filter(task=>requirementKey(task)!==dragState.key);
+      const indexes=remaining.map((task,index)=>requirementKey(task)===dragState.targetKey?index:-1).filter(index=>index>=0);
+      if(indexes.length){
+        const insertAt=dragState.after?indexes[indexes.length-1]+1:indexes[0];
+        remaining.splice(insertAt,0,...moved);
+        ensureDay(selectedDate).tasks=remaining;
+        dragState=null;render();
+        const synced=await saveState();
+        if(synced)showToast("需求及其任务已移动");
+      }else{dragState=null;clearDragMarkers()}
+    });
+    board.addEventListener("pointercancel",()=>{dragState=null;clearDragMarkers()});
+    const columnsMenu=document.querySelector(".columns-menu");
+    document.addEventListener("click",event=>{
+      if(columnsMenu.open&&!columnsMenu.contains(event.target))columnsMenu.removeAttribute("open");
+    });
+    document.addEventListener("keydown",event=>{
+      if(event.key==="Escape"&&columnsMenu.open)columnsMenu.removeAttribute("open");
+      if(event.target.matches("input,textarea,select"))return;
+      if(event.key==="ArrowLeft")moveDay(-1);
+      if(event.key==="ArrowRight")moveDay(1);
+    });
+    let pointerStart=null;
+    board.addEventListener("pointerdown",event=>{if(!event.target.closest("tr"))pointerStart=event.clientX});
+    board.addEventListener("pointerup",event=>{
+      if(pointerStart===null)return;
+      const diff=event.clientX-pointerStart;pointerStart=null;
+      if(Math.abs(diff)>70)moveDay(diff<0?1:-1);
+    });
+    let midnightTimer=null;
+    async function rolloverIfNeeded(){
+      const actualToday=startOfDay(new Date());
+      if(dateKey(actualToday)===dateKey(today))return false;
+      const previousTodayKey=dateKey(today);
+      const wasViewingToday=dateKey(selectedDate)===previousTodayKey;
+      today=actualToday;
+      const created=ensureDayByInheritance(today);
+      if(wasViewingToday)selectedDate=new Date(today);
+      render();
+      if(created)await saveState(false);
+      if(created)showToast("已自动复制昨日任务，当日进展与今日总结已清空");
+      return created;
+    }
+    function scheduleMidnightRollover(){
+      clearTimeout(midnightTimer);
+      const now=new Date();
+      const nextMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+      midnightTimer=setTimeout(async()=>{
+        await rolloverIfNeeded();
+        scheduleMidnightRollover();
+      },Math.max(1000,nextMidnight-now+100));
+    }
+    new ResizeObserver(updateProjectStage).observe(app);
+    window.addEventListener("resize",()=>{applyProjectScale(true);applyColumnWidths()});
+    window.addEventListener("focus",rolloverIfNeeded);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)rolloverIfNeeded()});
+    loadState().then(()=>{render();scheduleMidnightRollover()});
+  </script>
+</body>
+</html>

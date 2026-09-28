@@ -1,0 +1,62 @@
+<h2>设计 · 第 1 部分：整体架构</h2>
+<p class="subtitle">Skill 目录结构 + 工作流</p>
+
+<div class="section">
+  <h3>Skill 目录结构</h3>
+  <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.8;">
+    powers/skills/html-animation/<br>
+    ├── <span style="color: #7ecb76;">SKILL.md</span>              &nbsp;← Agent 执行的指令<br>
+    └── <span style="color: #7ecb76;">player/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color: #7ecb76;">template.html</span>    &nbsp;← 播放器 HTML 骨架<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color: #7ecb76;">player.css</span>      &nbsp;← 播放器样式<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;└── <span style="color: #7ecb76;">player.js</span>       &nbsp;← 播放器引擎
+  </div>
+</div>
+
+<div class="section">
+  <h3>工作流（5 步）</h3>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 12px 16px; border-radius: 8px;">
+      <div style="background: var(--accent); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">1</div>
+      <div><strong>解析故事</strong> → 拆分为场景序列，每场景包含：旁白文本、视觉描述、建议动画类型、预估时长</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 12px 16px; border-radius: 8px;">
+      <div style="background: var(--accent); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">2</div>
+      <div><strong>生成场景内容</strong> → 每个场景生成独立的 HTML 片段（Canvas/CSS/SVG 动画）</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 12px 16px; border-radius: 8px;">
+      <div style="background: var(--accent); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">3</div>
+      <div><strong>生成 TTS 音频</strong> → 调用 kokoro-text-to-speech，每场景生成一段 WAV 旁白</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 12px 16px; border-radius: 8px;">
+      <div style="background: var(--accent); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">4</div>
+      <div><strong>组装</strong> → 把场景片段 + 音频 + 字幕注入播放器模板，生成完整 HTML</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 12px 16px; border-radius: 8px;">
+      <div style="background: var(--accent); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">5</div>
+      <div><strong>输出</strong> → 保存到 workspace/ 或用户指定路径，告诉用户用浏览器打开</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>关键设计决策</h3>
+  <div class="mockup">
+    <div class="mockup-header">场景数据格式（Agent 和 Player 之间的约定）</div>
+    <div class="mockup-body" style="padding: 16px; font-family: monospace; font-size: 13px; background: #1a1a2e; color: #e0e0e0; border-radius: 0 0 8px 8px;">
+<span style="color: #888;">// Agent 生成场景描述，Player 引擎负责播放</span><br>
+<span style="color: #ff79c6;">const</span> <span style="color: #f8f8f2;">scenes</span> = [<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">id</span>: <span style="color: #f1fa8c;">"intro"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">narration</span>: <span style="color: #f1fa8c;">"欢迎来到产品演示..."</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">audio</span>: <span style="color: #f1fa8c;">"audio/scene-0.wav"</span>,  <span style="color: #888;">// TTS 生成的音频</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">duration</span>: <span style="color: #bd93f9;">8000</span>,  <span style="color: #888;">// 毫秒</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">transition</span>: <span style="color: #f1fa8c;">"fade"</span>,  <span style="color: #888;">// fade | slide | zoom | none</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #7ecb76;">content</span>: <span style="color: #f1fa8c;">"&lt;div&gt;...场景动画 HTML...&lt;/div&gt;"</span><br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;<span style="color: #888;">// ... 更多场景</span><br>
+];
+      </div>
+    </div>
+  </div>
+</div>

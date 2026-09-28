@@ -1,0 +1,5 @@
+{"_type": "metadata", "key": "eido:lili-mracrvlj:session_79283854eacd", "created_at": "2026-07-07T15:56:39.915955", "updated_at": "2026-07-07T15:57:41.843782", "metadata": {}, "last_consolidated": 0}
+{"role": "user", "content": "hi", "timestamp": "2026-07-07T15:56:39.927716"}
+{"role": "assistant", "content": "[Assistant reply unavailable due to model error.]", "timestamp": "2026-07-07T15:56:40.512537", "latency_ms": 597}
+{"role": "user", "content": "hi", "timestamp": "2026-07-07T15:57:41.723605"}
+{"role": "assistant", "content": "[Assistant reply unavailable due to model error.]", "timestamp": "2026-07-07T15:57:41.843777", "latency_ms": 148}
