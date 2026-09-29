@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from eido_agent.config import AgentConfig
-from eido_agent.llm import _headers
+from eido_agent.llm import _headers, _openai_headers
 
 
 class ProviderConfigurationTests(unittest.TestCase):
@@ -22,6 +22,14 @@ class ProviderConfigurationTests(unittest.TestCase):
     def test_anthropic_bearer_configuration_adds_authorization_header(self):
         config = AgentConfig(api_key="secret", auth_header="authorization_bearer")
         self.assertEqual(_headers(config), {"authorization": "Bearer secret"})
+
+    def test_openai_client_does_not_duplicate_sdk_bearer_header(self):
+        config = AgentConfig(api_key="secret", auth_header="authorization_bearer")
+        self.assertEqual(_openai_headers(config), {})
+
+    def test_openai_client_keeps_non_bearer_custom_headers(self):
+        config = AgentConfig(api_key="secret", auth_header="x-api-key")
+        self.assertEqual(_openai_headers(config), {"x-api-key": "secret"})
 
 
 if __name__ == "__main__":

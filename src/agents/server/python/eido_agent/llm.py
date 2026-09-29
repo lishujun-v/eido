@@ -84,7 +84,12 @@ class LLMClient:
     ) -> LLMResult:
         from openai import AsyncOpenAI
 
-        headers = _headers(self.config)
+        # AsyncOpenAI already supplies ``Authorization: Bearer <api_key>``.
+        # Passing that header again through ``default_headers`` makes httpx
+        # coalesce the duplicate values into ``Bearer <key>, Bearer <key>``.
+        # DeepSeek's OpenResty gateway rejects that malformed credential with
+        # an HTML 400 before the request reaches the API application.
+        headers = _openai_headers(self.config)
         client = AsyncOpenAI(
             api_key=self.config.api_key or "",
             base_url=self.config.api_base or None,
@@ -328,6 +333,19 @@ def _headers(config: AgentConfig) -> dict[str, str]:
         headers["authorization"] = f"Bearer {config.api_key}"
     if config.api_version:
         headers["anthropic-version"] = config.api_version
+    return headers
+
+
+def _openai_headers(config: AgentConfig) -> dict[str, str]:
+    """Return extra headers for OpenAI-compatible clients.
+
+    The OpenAI SDK owns bearer authentication from ``api_key``. Keep custom
+    headers such as ``x-api-key`` but never duplicate its Authorization header.
+    Anthropic still uses :func:`_headers` directly because its SDK does not
+    provide the same OpenAI-compatible authentication behavior.
+    """
+    headers = _headers(config)
+    headers.pop("authorization", None)
     return headers
 
 
